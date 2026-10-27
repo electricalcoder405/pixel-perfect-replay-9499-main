@@ -4,11 +4,23 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ─────────────────────────────────────────────────────────────────────────────
+   Old Monk Mission Control — design tokens
+
+   Palette: deep black and charcoal surfaces, copper and amber for brand and
+   emphasis, cyan for live telemetry, purple for orbital accents. Status colours
+   (success / warning / critical) stay saturated so state is readable at a glance.
+
+   All colours are defined once as CSS variables below; components must use the
+   Tailwind names (text-amber, bg-card, ...) and never hard-coded colour values.
+   ───────────────────────────────────────────────────────────────────────────── */
+
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -28,71 +40,176 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+
+  /* Brand and telemetry colours */
+  --color-copper: var(--copper);
   --color-amber: var(--amber);
   --color-cyan: var(--cyan);
+  --color-purple: var(--purple);
   --color-success: var(--success);
   --color-warning: var(--warning);
   --color-critical: var(--critical);
-  --font-display: "Chakra Petch", ui-sans-serif, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, monospace;
-  --font-sans: "Chakra Petch", ui-sans-serif, sans-serif;
+
+  /* Surfaces, from the page upwards */
+  --color-surface-0: var(--surface-0);
+  --color-surface-1: var(--surface-1);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+
+  /* Typography. Space Grotesk for headings and brand, Inter for interface text,
+     IBM Plex Sans for data labels, IBM Plex Mono for values and logs. */
+  --font-display: "Space Grotesk", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-data: "IBM Plex Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  /* Type scale. Nothing smaller than 0.6875rem (11px) is used by new components. */
+  --text-2xs: 0.6875rem;
+  --text-2xs--line-height: 1rem;
+  --text-metric-sm: 1.25rem;
+  --text-metric-sm--line-height: 1.5rem;
+  --text-metric-md: 1.75rem;
+  --text-metric-md--line-height: 2rem;
+  --text-metric-lg: 2.5rem;
+  --text-metric-lg--line-height: 2.75rem;
+  --text-display: 3rem;
+  --text-display--line-height: 1;
+
+  /* Shadows and glows */
+  --shadow-glow-cyan: 0 0 24px -8px var(--cyan);
+  --shadow-glow-amber: 0 0 24px -8px var(--amber);
+  --shadow-panel: inset 0 1px 0 oklch(1 0 0 / 5%), 0 1px 2px oklch(0 0 0 / 40%);
+
+  /* Motion */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
 }
 
 :root {
   --radius: 0.75rem;
-  --background: oklch(0.11 0.012 250);
-  --foreground: oklch(0.98 0 0);
-  --card: oklch(0.18 0.02 250 / 45%);
-  --card-foreground: oklch(0.98 0 0);
-  --popover: oklch(0.16 0.02 250);
-  --popover-foreground: oklch(0.98 0 0);
-  --primary: oklch(0.65 0.14 65);
-  --primary-foreground: oklch(0.12 0.01 250);
-  --secondary: oklch(0.22 0.02 250);
-  --secondary-foreground: oklch(0.98 0 0);
-  --muted: oklch(0.22 0.02 250);
-  --muted-foreground: oklch(0.68 0.03 240);
-  --accent: oklch(0.85 0.15 205);
-  --accent-foreground: oklch(0.12 0.01 250);
-  --destructive: oklch(0.63 0.24 25);
+
+  /* Surfaces: warm near-black to charcoal */
+  --background: oklch(0.12 0.004 60);
+  --surface-0: oklch(0.12 0.004 60);
+  --surface-1: oklch(0.16 0.006 60);
+  --surface-2: oklch(0.2 0.008 60);
+  --surface-3: oklch(0.25 0.01 60);
+
+  --foreground: oklch(0.96 0.006 80);
+  --card: oklch(0.18 0.007 60 / 55%);
+  --card-foreground: oklch(0.96 0.006 80);
+  --popover: oklch(0.17 0.007 60);
+  --popover-foreground: oklch(0.96 0.006 80);
+
+  --primary: oklch(0.76 0.15 72);
+  --primary-foreground: oklch(0.14 0.01 60);
+  --secondary: oklch(0.22 0.008 60);
+  --secondary-foreground: oklch(0.96 0.006 80);
+  --muted: oklch(0.23 0.008 60);
+  --muted-foreground: oklch(0.72 0.015 75);
+  --accent: oklch(0.82 0.12 200);
+  --accent-foreground: oklch(0.14 0.01 60);
+  --destructive: oklch(0.65 0.22 25);
   --destructive-foreground: oklch(0.98 0 0);
-  --border: oklch(0.85 0.15 205 / 16%);
-  --input: oklch(0.85 0.15 205 / 20%);
-  --ring: oklch(0.85 0.15 205);
-  --amber: oklch(0.65 0.14 65);
-  --cyan: oklch(0.85 0.15 205);
-  --success: oklch(0.87 0.22 155);
-  --warning: oklch(0.75 0.18 55);
-  --critical: oklch(0.63 0.24 25);
+
+  --border: oklch(0.82 0.08 70 / 15%);
+  --input: oklch(0.82 0.08 70 / 20%);
+  --ring: oklch(0.82 0.12 200);
+
+  /* Brand and telemetry */
+  --copper: oklch(0.64 0.12 48);
+  --amber: oklch(0.76 0.15 72);
+  --cyan: oklch(0.82 0.12 200);
+  --purple: oklch(0.7 0.15 295);
+
+  /* Status */
+  --success: oklch(0.8 0.18 155);
+  --warning: oklch(0.78 0.16 70);
+  --critical: oklch(0.67 0.22 25);
 }
 
 @layer base {
   * { border-color: var(--color-border); }
+  html { color-scheme: dark; -webkit-text-size-adjust: 100%; }
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
+    font-feature-settings: "cv11", "ss01";
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
+  h1, h2, h3, h4 { font-family: var(--font-display); }
+
+  /* Keyboard focus is always visible and never relies on colour alone. */
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+  ::selection { background: color-mix(in oklab, var(--amber) 35%, transparent); }
 }
 
+/* Surfaces */
 @utility glass {
-  background: linear-gradient(145deg, oklch(0.2 0.03 245 / 55%), oklch(0.12 0.015 250 / 40%));
-  backdrop-filter: blur(16px) saturate(140%);
+  background: linear-gradient(145deg, oklch(0.21 0.009 60 / 60%), oklch(0.14 0.005 60 / 45%));
+  backdrop-filter: blur(16px) saturate(130%);
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
-  box-shadow: inset 0 1px 0 oklch(1 0 0 / 6%), 0 0 24px -12px var(--cyan);
+  box-shadow: inset 0 1px 0 oklch(1 0 0 / 5%), 0 0 24px -14px var(--copper);
 }
-@utility glow-amber { text-shadow: 0 0 18px color-mix(in oklab, var(--amber) 70%, transparent); }
-@utility glow-cyan { text-shadow: 0 0 14px color-mix(in oklab, var(--cyan) 70%, transparent); }
+@utility surface-solid {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-panel);
+}
+@utility surface-inset {
+  background: var(--surface-0);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+/* Text */
+@utility glow-amber { text-shadow: 0 0 18px color-mix(in oklab, var(--amber) 55%, transparent); }
+@utility glow-copper { text-shadow: 0 0 18px color-mix(in oklab, var(--copper) 60%, transparent); }
+@utility glow-cyan { text-shadow: 0 0 14px color-mix(in oklab, var(--cyan) 60%, transparent); }
+@utility eyebrow {
+  font-family: var(--font-data);
+  font-size: var(--text-2xs);
+  line-height: var(--text-2xs--line-height);
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+@utility num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "zero";
+}
+
+/* Indicators and decoration */
 @utility led {
   width: 0.5rem; height: 0.5rem; border-radius: 9999px;
   background: currentColor; box-shadow: 0 0 10px currentColor;
   animation: pulse-led 1.6s ease-in-out infinite;
 }
 @utility scanline {
-  background-image: repeating-linear-gradient(0deg, oklch(1 0 0 / 2.5%) 0 1px, transparent 1px 3px);
+  background-image: repeating-linear-gradient(0deg, oklch(1 0 0 / 2%) 0 1px, transparent 1px 3px);
 }
 
 @keyframes pulse-led { 50% { opacity: 0.45; } }
 @keyframes spin-slow { to { transform: rotate(360deg); } }
 @keyframes earth-scroll { to { background-position: -200% 0; } }
+@keyframes shimmer { to { background-position: -200% 0; } }
+
+/* Users who ask for less motion get none of the looping decoration. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
