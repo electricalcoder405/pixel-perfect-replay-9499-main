@@ -6,7 +6,7 @@ import { Starfield } from "@/components/mission/Starfield";
 import { Loader } from "@/components/mission/Loader";
 import { CubeSat } from "@/components/mission/CubeSat";
 import { Battery, Dial, Earth, Horizon, MiniChart, Panel, StatCard, StatusList, TelemetryLog, Vector } from "@/components/mission/Panels";
-import { fmtTime, useTelemetry } from "@/lib/telemetry";
+import { ACCEL, accelToPercent, fmtTime, useTelemetry } from "@/lib/telemetry";
 
 export const Route = createFileRoute("/")({
   ssr: false,
@@ -110,9 +110,9 @@ function Dashboard() {
         <StatCard label="Mission Time" value={fmtTime(d.missionTime).slice(2)} icon={<Timer className={I} />} status="Running" tone="info" spark={(d.missionTime % 60) / 0.6} />
         <StatCard label="GPS Latitude" value={d.latitude.toFixed(4)} unit="°N" icon={<Navigation className={I} />} status={d.gpsFix ? "Fix" : "Search"} tone={d.gpsFix ? "ok" : "warn"} />
         <StatCard label="GPS Longitude" value={d.longitude.toFixed(4)} unit="°E" icon={<Navigation className={I} />} status={d.gpsFix ? "Fix" : "Search"} tone={d.gpsFix ? "ok" : "warn"} />
-        <StatCard label="Accel X" value={d.accelerationX.toFixed(2)} unit="m/s²" icon={<Move3d className={I} />} status="MPU6050" tone="info" spark={50 + d.accelerationX * 5} />
-        <StatCard label="Accel Y" value={d.accelerationY.toFixed(2)} unit="m/s²" icon={<Move3d className={I} />} status="MPU6050" tone="info" spark={50 + d.accelerationY * 5} />
-        <StatCard label="Accel Z" value={d.accelerationZ.toFixed(2)} unit="m/s²" icon={<Move3d className={I} />} status="MPU6050" tone="info" spark={d.accelerationZ * 10} />
+        <StatCard label="Accel X" value={d.accelerationX.toFixed(ACCEL.digits)} unit={ACCEL.label} icon={<Move3d className={I} />} status="MPU6050" tone="info" spark={accelToPercent(d.accelerationX)} />
+        <StatCard label="Accel Y" value={d.accelerationY.toFixed(ACCEL.digits)} unit={ACCEL.label} icon={<Move3d className={I} />} status="MPU6050" tone="info" spark={accelToPercent(d.accelerationY)} />
+        <StatCard label="Accel Z" value={d.accelerationZ.toFixed(ACCEL.digits)} unit={ACCEL.label} icon={<Move3d className={I} />} status="MPU6050" tone="info" spark={(accelToPercent(d.accelerationZ) - 50) * 2} />
         <StatCard label="Gyro X" value={d.gyroX.toFixed(2)} unit="°/s" icon={<RotateCw className={I} />} status="MPU6050" tone="info" spark={50 + d.gyroX * 5} />
         <StatCard label="Gyro Y" value={d.gyroY.toFixed(2)} unit="°/s" icon={<RotateCw className={I} />} status="MPU6050" tone="info" spark={50 + d.gyroY * 5} />
         <StatCard label="Gyro Z" value={d.gyroZ.toFixed(2)} unit="°/s" icon={<RotateCw className={I} />} status="MPU6050" tone="info" spark={d.gyroZ * 8} />
@@ -124,7 +124,7 @@ function Dashboard() {
       <div className="grid gap-4 lg:grid-cols-12">
         <Panel title="Motion Control" icon={<Activity className={I} />} className="lg:col-span-4">
           <div className="space-y-4">
-            <Vector label={`Acceleration · |a| ${accel.toFixed(2)} m/s²`} x={d.accelerationX} y={d.accelerationY} z={d.accelerationZ} unit="" scale={10} />
+            <Vector label={`Acceleration · |a| ${accel.toFixed(ACCEL.digits)} ${ACCEL.label}`} x={d.accelerationX} y={d.accelerationY} z={d.accelerationZ} unit="" scale={ACCEL.fullScale} />
             <Vector label={`Angular Velocity · |ω| ${angVel.toFixed(2)} °/s`} x={d.gyroX} y={d.gyroY} z={d.gyroZ} unit="" scale={10} />
           </div>
         </Panel>
