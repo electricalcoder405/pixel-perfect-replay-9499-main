@@ -25,10 +25,23 @@ export interface SurfaceProps extends ComponentPropsWithoutRef<"div"> {
 }
 
 /** The base container for panels and cards. */
-export function Surface({ as: Tag = "div", variant = "glass", padding = "md", interactive = false, className, ...props }: SurfaceProps) {
+export function Surface({
+  as: Tag = "div",
+  variant = "glass",
+  padding = "md",
+  interactive = false,
+  className,
+  ...props
+}: SurfaceProps) {
   return (
     <Tag
-      className={cn("relative", variantClass[variant], paddingClass[padding], interactive && "transition-shadow duration-300 hover:shadow-glow-cyan", className)}
+      className={cn(
+        "relative",
+        variantClass[variant],
+        paddingClass[padding],
+        interactive && "transition-shadow duration-300 hover:shadow-glow-cyan",
+        className,
+      )}
       {...props}
     />
   );

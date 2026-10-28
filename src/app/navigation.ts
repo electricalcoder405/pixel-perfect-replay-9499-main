@@ -4,13 +4,30 @@
  * Adding a section means adding one entry here and one file in `src/routes/dashboard/`.
  */
 export type NavIconName =
-  | "overview" | "telemetry" | "satellite" | "ground-station" | "sensors" | "gps"
-  | "logs" | "diagnostics" | "analytics" | "history" | "settings";
+  | "overview"
+  | "telemetry"
+  | "satellite"
+  | "ground-station"
+  | "sensors"
+  | "gps"
+  | "logs"
+  | "diagnostics"
+  | "analytics"
+  | "history"
+  | "settings";
 
 export type NavPath =
-  | "/dashboard" | "/dashboard/telemetry" | "/dashboard/satellite" | "/dashboard/ground-station"
-  | "/dashboard/sensors" | "/dashboard/gps" | "/dashboard/logs" | "/dashboard/diagnostics"
-  | "/dashboard/analytics" | "/dashboard/history" | "/dashboard/settings";
+  | "/dashboard"
+  | "/dashboard/telemetry"
+  | "/dashboard/satellite"
+  | "/dashboard/ground-station"
+  | "/dashboard/sensors"
+  | "/dashboard/gps"
+  | "/dashboard/logs"
+  | "/dashboard/diagnostics"
+  | "/dashboard/analytics"
+  | "/dashboard/history"
+  | "/dashboard/settings";
 
 export interface NavItem {
   readonly id: NavIconName;
@@ -28,32 +45,87 @@ export const NAV_GROUPS: readonly NavGroup[] = [
   {
     label: "Operations",
     items: [
-      { id: "overview", label: "Mission Overview", to: "/dashboard", description: "Live attitude, power, sensors and link status at a glance." },
-      { id: "telemetry", label: "Telemetry", to: "/dashboard/telemetry", description: "Every telemetry channel with live values, trends and update times." },
-      { id: "satellite", label: "Satellite", to: "/dashboard/satellite", description: "3D attitude visualisation with orbit and Earth context." },
-      { id: "ground-station", label: "Ground Station", to: "/dashboard/ground-station", description: "Receiver, radio link and ground-segment status." },
+      {
+        id: "overview",
+        label: "Mission Overview",
+        to: "/dashboard",
+        description: "Live attitude, power, sensors and link status at a glance.",
+      },
+      {
+        id: "telemetry",
+        label: "Telemetry",
+        to: "/dashboard/telemetry",
+        description: "Every telemetry channel with live values, trends and update times.",
+      },
+      {
+        id: "satellite",
+        label: "Satellite",
+        to: "/dashboard/satellite",
+        description: "3D attitude visualisation with orbit and Earth context.",
+      },
+      {
+        id: "ground-station",
+        label: "Ground Station",
+        to: "/dashboard/ground-station",
+        description: "Receiver, radio link and ground-segment status.",
+      },
     ],
   },
   {
     label: "Instruments",
     items: [
-      { id: "sensors", label: "Sensors", to: "/dashboard/sensors", description: "Health and readings for the DHT11, BMP280, MPU6050 and GPS." },
-      { id: "gps", label: "GPS", to: "/dashboard/gps", description: "Position, heading and route history with fix status." },
+      {
+        id: "sensors",
+        label: "Sensors",
+        to: "/dashboard/sensors",
+        description: "Health and readings for the DHT11, BMP280, MPU6050 and GPS.",
+      },
+      {
+        id: "gps",
+        label: "GPS",
+        to: "/dashboard/gps",
+        description: "Position, heading and route history with fix status.",
+      },
     ],
   },
   {
     label: "Data",
     items: [
-      { id: "logs", label: "Mission Logs", to: "/dashboard/logs", description: "Timestamped events, link changes and packet notices." },
-      { id: "diagnostics", label: "Diagnostics", to: "/dashboard/diagnostics", description: "Packet loss, packet rate, signal and receiver health." },
-      { id: "analytics", label: "Analytics", to: "/dashboard/analytics", description: "Interactive charts with zoom, pan and crosshair across every channel." },
-      { id: "history", label: "History", to: "/dashboard/history", description: "Browse and export recorded telemetry." },
+      {
+        id: "logs",
+        label: "Mission Logs",
+        to: "/dashboard/logs",
+        description: "Timestamped events, link changes and packet notices.",
+      },
+      {
+        id: "diagnostics",
+        label: "Diagnostics",
+        to: "/dashboard/diagnostics",
+        description: "Packet loss, packet rate, signal and receiver health.",
+      },
+      {
+        id: "analytics",
+        label: "Analytics",
+        to: "/dashboard/analytics",
+        description: "Interactive charts with zoom, pan and crosshair across every channel.",
+      },
+      {
+        id: "history",
+        label: "History",
+        to: "/dashboard/history",
+        description: "Browse and export recorded telemetry.",
+      },
     ],
   },
   {
     label: "System",
     items: [
-      { id: "settings", label: "Settings", to: "/dashboard/settings", description: "Data source, units and display preferences." },
+      {
+        id: "settings",
+        label: "Settings",
+        to: "/dashboard/settings",
+        description: "Data source, units and display preferences.",
+      },
     ],
   },
 ];

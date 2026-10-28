@@ -1,4 +1,5 @@
-export type AlertKind = "sensor-disconnected" | "packet-timeout" | "gps-lost" | "connection-lost" | "invalid-packet";
+export type AlertKind =
+  "sensor-disconnected" | "packet-timeout" | "gps-lost" | "connection-lost" | "invalid-packet";
 export type AlertLevel = "info" | "warning" | "critical";
 
 export interface Alert {
@@ -47,7 +48,12 @@ export class AlertManager {
       const current = this.items[index] as Alert;
       if (current.message === input.message && current.level === input.level) return;
       const next = this.items.slice();
-      next[index] = { ...current, message: input.message, level: input.level, count: current.count + 1 };
+      next[index] = {
+        ...current,
+        message: input.message,
+        level: input.level,
+        count: current.count + 1,
+      };
       this.items = next;
       return;
     }

@@ -14,7 +14,11 @@ export function ModulePage({ section }: { section: NavIconName }) {
           icon={<Cog className="h-4 w-4" />}
           status={<ConnectionIndicator />}
           state="empty"
-          empty={{ title: `${item.label} is under development`, description: "It will show live data from the active telemetry source as soon as it is released." }}
+          empty={{
+            title: `${item.label} is under development`,
+            description:
+              "It will show live data from the active telemetry source as soon as it is released.",
+          }}
         />
       </WidgetGrid>
     </div>

@@ -33,20 +33,51 @@ export function evaluateSensors(
       const at = updatedAt[field];
       if (at !== undefined && (lastUpdate === null || at > lastUpdate)) lastUpdate = at;
     }
-    if (!isAvailable) return { id: sensor.id, label: sensor.label, available: false, lastUpdate, health: "awaiting", errors: [] };
+    if (!isAvailable)
+      return {
+        id: sensor.id,
+        label: sensor.label,
+        available: false,
+        lastUpdate,
+        health: "awaiting",
+        errors: [],
+      };
 
     if (lastUpdate !== null && now - lastUpdate > timeoutMs) {
       const seconds = Math.round((now - lastUpdate) / 1000);
-      return { id: sensor.id, label: sensor.label, available: true, lastUpdate, health: "offline", errors: [`No data for ${seconds} s`] };
+      return {
+        id: sensor.id,
+        label: sensor.label,
+        available: true,
+        lastUpdate,
+        health: "offline",
+        errors: [`No data for ${seconds} s`],
+      };
     }
     if (sensor.id === "gps" && !gpsFix) {
-      return { id: sensor.id, label: sensor.label, available: true, lastUpdate, health: "degraded", errors: ["No GPS fix"] };
+      return {
+        id: sensor.id,
+        label: sensor.label,
+        available: true,
+        lastUpdate,
+        health: "degraded",
+        errors: ["No GPS fix"],
+      };
     }
-    return { id: sensor.id, label: sensor.label, available: true, lastUpdate, health: "ok", errors: [] };
+    return {
+      id: sensor.id,
+      label: sensor.label,
+      available: true,
+      lastUpdate,
+      health: "ok",
+      errors: [],
+    };
   });
 }
 
 /** Compact identity of a sensor list, used to keep array identity stable between unchanged ticks. */
 export function sensorSignature(sensors: readonly SensorState[]): string {
-  return sensors.map((s) => `${s.id}:${s.health}:${s.lastUpdate ?? ""}:${s.errors.join("|")}`).join(";");
+  return sensors
+    .map((s) => `${s.id}:${s.health}:${s.lastUpdate ?? ""}:${s.errors.join("|")}`)
+    .join(";");
 }

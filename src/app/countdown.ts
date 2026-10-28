@@ -1,6 +1,12 @@
 export type CountdownState =
   | { readonly state: "unscheduled" }
-  | { readonly state: "before"; readonly days: number; readonly hours: number; readonly minutes: number; readonly seconds: number }
+  | {
+      readonly state: "before";
+      readonly days: number;
+      readonly hours: number;
+      readonly minutes: number;
+      readonly seconds: number;
+    }
   | { readonly state: "after"; readonly elapsedSeconds: number };
 
 /** Time remaining until `target`, or elapsed since it. A null target means no schedule yet. */

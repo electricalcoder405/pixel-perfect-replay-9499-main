@@ -21,15 +21,50 @@ interface NumberSpec {
 }
 
 const NUMBER_SPECS: readonly NumberSpec[] = [
-  { field: "temperature", aliases: ["temperature", "temp", "dhttemp", "dhttemperature"], min: -80, max: 125 },
+  {
+    field: "temperature",
+    aliases: ["temperature", "temp", "dhttemp", "dhttemperature", "bmptemp", "temperature_dht"],
+    min: -80,
+    max: 125,
+  },
   { field: "humidity", aliases: ["humidity", "hum", "rh", "dhthumidity"], min: 0, max: 100 },
-  { field: "pressure", aliases: ["pressure", "pres", "press", "bmppressure", "hpa"], min: 300, max: 1100 },
-  { field: "altitude", aliases: ["altitude", "alt", "bmpaltitude", "estimatedaltitude"], min: -1000, max: 100_000 },
+  {
+    field: "pressure",
+    aliases: ["pressure", "pres", "press", "bmppressure", "hpa", "baro"],
+    min: 300,
+    max: 1100,
+  },
+  {
+    field: "altitude",
+    aliases: ["altitude", "alt", "bmpaltitude", "estimatedaltitude", "gpsalt"],
+    min: -1000,
+    max: 100_000,
+  },
   { field: "latitude", aliases: ["latitude", "lat", "gpslat"], min: -90, max: 90 },
-  { field: "longitude", aliases: ["longitude", "lon", "lng", "long", "gpslon", "gpslng"], min: -180, max: 180 },
-  { field: "accelerationX", aliases: ["accelerationx", "accelx", "accx", "ax"], min: -500, max: 500 },
-  { field: "accelerationY", aliases: ["accelerationy", "accely", "accy", "ay"], min: -500, max: 500 },
-  { field: "accelerationZ", aliases: ["accelerationz", "accelz", "accz", "az"], min: -500, max: 500 },
+  {
+    field: "longitude",
+    aliases: ["longitude", "lon", "lng", "long", "gpslon", "gpslng"],
+    min: -180,
+    max: 180,
+  },
+  {
+    field: "accelerationX",
+    aliases: ["accelerationx", "accelx", "accx", "ax"],
+    min: -500,
+    max: 500,
+  },
+  {
+    field: "accelerationY",
+    aliases: ["accelerationy", "accely", "accy", "ay"],
+    min: -500,
+    max: 500,
+  },
+  {
+    field: "accelerationZ",
+    aliases: ["accelerationz", "accelz", "accz", "az"],
+    min: -500,
+    max: 500,
+  },
   { field: "gyroX", aliases: ["gyrox", "gx"], min: -20_000, max: 20_000 },
   { field: "gyroY", aliases: ["gyroy", "gy"], min: -20_000, max: 20_000 },
   { field: "gyroZ", aliases: ["gyroz", "gz"], min: -20_000, max: 20_000 },
@@ -37,9 +72,19 @@ const NUMBER_SPECS: readonly NumberSpec[] = [
   { field: "rollRaw", aliases: ["roll", "rollraw"], min: -1_000_000, max: 1_000_000 },
   { field: "pitchRaw", aliases: ["pitch", "pitchraw"], min: -1_000_000, max: 1_000_000 },
   { field: "yaw", aliases: ["yaw", "heading"], min: -1_000_000, max: 1_000_000 },
-  { field: "battery", aliases: ["battery", "batt", "batterypercent"], min: 0, max: 100 },
-  { field: "signalStrength", aliases: ["signalstrength", "rssi", "signal"], min: -150, max: 0 },
-  { field: "missionTime", aliases: ["missiontime", "uptime"], min: 0, max: 1e10 },
+  {
+    field: "battery",
+    aliases: ["battery", "batt", "batterypercent", "vbat", "bat"],
+    min: 0,
+    max: 100,
+  },
+  {
+    field: "signalStrength",
+    aliases: ["signalstrength", "rssi", "signal", "rssidbm"],
+    min: -150,
+    max: 0,
+  },
+  { field: "missionTime", aliases: ["missiontime", "uptime", "millis"], min: 0, max: 1e10 },
 ];
 
 const BOOLEAN_SPECS: readonly { field: "gpsFix" | "charging"; aliases: readonly string[] }[] = [
@@ -47,7 +92,16 @@ const BOOLEAN_SPECS: readonly { field: "gpsFix" | "charging"; aliases: readonly 
   { field: "charging", aliases: ["charging", "ischarging"] },
 ];
 
-const PACKET_NO_ALIASES = ["packetno", "packetnumber", "packet", "packetcount", "seq", "sequence", "counter", "id"];
+const PACKET_NO_ALIASES = [
+  "packetno",
+  "packetnumber",
+  "packet",
+  "packetcount",
+  "seq",
+  "sequence",
+  "counter",
+  "id",
+];
 const TIMESTAMP_ALIASES = ["timestamp", "ts", "time", "receivedat"];
 
 /** Lower-cases a key and strips separators, so `accel_x`, `AccelX` and `accel-x` match. */
@@ -97,7 +151,32 @@ export function parseBridgePacket(message: string): PacketParseResult {
   try {
     parsed = JSON.parse(message);
   } catch {
-    return { ok: false, reason: "Packet is not valid JSON" };
+    const trimmed = message.trim();
+    if (trimmed.startsWith("OLDMONK,") || trimmed.startsWith("PKT,")) {
+      const parts = trimmed.split(",");
+      parsed = {
+        packetNo: parts[1],
+        temp: parts[2],
+        hum: parts[3],
+        press: parts[4],
+        alt: parts[5],
+        ax: parts[6],
+        ay: parts[7],
+        az: parts[8],
+        gx: parts[9],
+        gy: parts[10],
+        gz: parts[11],
+        roll: parts[12],
+        pitch: parts[13],
+        yaw: parts[14],
+        lat: parts[15],
+        lon: parts[16],
+        rssi: parts[17],
+        fix: parts[18],
+      };
+    } else {
+      return { ok: false, reason: "Packet is not valid JSON" };
+    }
   }
   if (!isRecord(parsed)) return { ok: false, reason: "Packet is not a JSON object" };
 
@@ -143,13 +222,25 @@ export function parseBridgePacket(message: string): PacketParseResult {
   }
 
   if (usable === 0) {
-    return { ok: false, reason: rejected.length > 0 ? `No valid values (rejected: ${rejected.join(", ")})` : "Packet contains no telemetry values" };
+    return {
+      ok: false,
+      reason:
+        rejected.length > 0
+          ? `No valid values (rejected: ${rejected.join(", ")})`
+          : "Packet contains no telemetry values",
+    };
   }
 
   const packetRaw = toNumber(find(PACKET_NO_ALIASES));
-  const packetNo = packetRaw !== null && Number.isInteger(packetRaw) && packetRaw >= 0 ? packetRaw : null;
+  const packetNo =
+    packetRaw !== null && Number.isInteger(packetRaw) && packetRaw >= 0 ? packetRaw : null;
   if (packetNo !== null) fields.packetCount = packetNo;
   fields.connected = true;
 
-  return { ok: true, fields, packetNo, timestamp: toEpochMs(find(TIMESTAMP_ALIASES) ?? parsed["timestamp"]) };
+  return {
+    ok: true,
+    fields,
+    packetNo,
+    timestamp: toEpochMs(find(TIMESTAMP_ALIASES) ?? parsed["timestamp"]),
+  };
 }

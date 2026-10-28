@@ -1,4 +1,16 @@
-import { Activity, History, LayoutDashboard, LineChart, MapPin, RadioTower, Satellite, ScrollText, Settings, Stethoscope, Cpu } from "lucide-react";
+import {
+  Activity,
+  History,
+  LayoutDashboard,
+  LineChart,
+  MapPin,
+  RadioTower,
+  Satellite,
+  ScrollText,
+  Settings,
+  Stethoscope,
+  Cpu,
+} from "lucide-react";
 import type { ComponentType, SVGProps } from "react";
 import type { NavIconName } from "@/app/navigation";
 

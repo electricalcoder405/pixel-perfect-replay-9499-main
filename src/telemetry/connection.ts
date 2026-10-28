@@ -1,5 +1,14 @@
 /** Connection lifecycle shared by every telemetry source. */
-export type ConnectionState = "idle" | "connecting" | "reconnecting" | "connected" | "stale" | "disconnected" | "error";
+export type ConnectionState =
+  | "disconnected"
+  | "connecting"
+  | "connected"
+  | "receiving"
+  | "waiting"
+  | "stale"
+  | "error"
+  | "reconnecting"
+  | "idle";
 
 export type ConnectionTone = "ok" | "info" | "warn" | "crit" | "neutral";
 
@@ -20,11 +29,58 @@ export interface ConnectionMeta {
 }
 
 export const CONNECTION_META: Readonly<Record<ConnectionState, ConnectionMeta>> = {
-  idle: { label: "Idle", description: "Telemetry source is not running.", tone: "neutral", live: false },
-  connecting: { label: "Connecting", description: "Establishing the telemetry link.", tone: "info", live: false },
-  reconnecting: { label: "Reconnecting", description: "Link lost. Trying to restore it.", tone: "warn", live: false },
-  connected: { label: "Connected", description: "Telemetry is flowing.", tone: "ok", live: true },
-  stale: { label: "Stale Data", description: "Connected, but no packet has arrived recently.", tone: "warn", live: false },
-  disconnected: { label: "Disconnected", description: "Link lost.", tone: "crit", live: false },
-  error: { label: "Link Error", description: "The telemetry link reported an error.", tone: "crit", live: false },
+  idle: {
+    label: "Idle",
+    description: "Telemetry source is not running.",
+    tone: "neutral",
+    live: false,
+  },
+  waiting: {
+    label: "Waiting",
+    description: "Waiting for Ground Controller...",
+    tone: "warn",
+    live: false,
+  },
+  connecting: {
+    label: "Connecting",
+    description: "Establishing link to ground controller bridge...",
+    tone: "info",
+    live: false,
+  },
+  connected: {
+    label: "Connected",
+    description: "Bridge linked. Ready for telemetry packets.",
+    tone: "ok",
+    live: true,
+  },
+  receiving: {
+    label: "Receiving",
+    description: "Live aerospace telemetry streaming.",
+    tone: "ok",
+    live: true,
+  },
+  reconnecting: {
+    label: "Reconnecting",
+    description: "Ground link lost. Attempting reconnection...",
+    tone: "warn",
+    live: false,
+  },
+  stale: {
+    label: "Stale Data",
+    description: "Connected, but no packet has arrived recently.",
+    tone: "warn",
+    live: false,
+  },
+  disconnected: {
+    label: "Disconnected",
+    description: "Ground controller link disconnected.",
+    tone: "crit",
+    live: false,
+  },
+  error: {
+    label: "Link Error",
+    description: "The telemetry link reported an error.",
+    tone: "crit",
+    live: false,
+  },
 };

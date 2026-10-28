@@ -22,15 +22,33 @@ export interface MissionInputs {
   readonly now: number;
 }
 
-export function deriveMissionState({ startTime, packetCount, lastPacketTime, connection, now }: MissionInputs): MissionState {
-  if (startTime === null) return { status: "standby", startTime: null, durationMs: 0, packetCount, lastPacketTime };
+export function deriveMissionState({
+  startTime,
+  packetCount,
+  lastPacketTime,
+  connection,
+  now,
+}: MissionInputs): MissionState {
+  if (startTime === null)
+    return { status: "standby", startTime: null, durationMs: 0, packetCount, lastPacketTime };
 
   let status: MissionStatus;
   switch (connection.state) {
-    case "connected": status = "active"; break;
-    case "stale": status = "degraded"; break;
-    default: status = "link-lost";
+    case "connected":
+      status = "active";
+      break;
+    case "stale":
+      status = "degraded";
+      break;
+    default:
+      status = "link-lost";
   }
   const end = status === "link-lost" ? (lastPacketTime ?? startTime) : now;
-  return { status, startTime, durationMs: Math.max(0, end - startTime), packetCount, lastPacketTime };
+  return {
+    status,
+    startTime,
+    durationMs: Math.max(0, end - startTime),
+    packetCount,
+    lastPacketTime,
+  };
 }

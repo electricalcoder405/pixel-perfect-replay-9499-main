@@ -10,17 +10,33 @@ class FakeSocket implements WebSocketLike {
   onerror: ((e: unknown) => void) | null = null;
   onclose: ((e: { code: number; reason: string }) => void) | null = null;
   closed = false;
-  close() { this.closed = true; this.readyState = 3; }
-  open() { this.readyState = 1; this.onopen?.({}); }
-  message(data: unknown) { this.onmessage?.({ data }); }
-  drop(code = 1006) { this.readyState = 3; this.onclose?.({ code, reason: "" }); }
+  close() {
+    this.closed = true;
+    this.readyState = 3;
+  }
+  open() {
+    this.readyState = 1;
+    this.onopen?.({});
+  }
+  message(data: unknown) {
+    this.onmessage?.({ data });
+  }
+  drop(code = 1006) {
+    this.readyState = 3;
+    this.onclose?.({ code, reason: "" });
+  }
 }
 
 const parse: PacketParser = (message) => {
   try {
     const raw = JSON.parse(message) as { packetNo?: number; temperature?: number };
     if (typeof raw.packetNo !== "number") return { ok: false, reason: "missing packetNo" };
-    return { ok: true, fields: typeof raw.temperature === "number" ? { temperature: raw.temperature } : {}, packetNo: raw.packetNo, timestamp: null };
+    return {
+      ok: true,
+      fields: typeof raw.temperature === "number" ? { temperature: raw.temperature } : {},
+      packetNo: raw.packetNo,
+      timestamp: null,
+    };
   } catch {
     return { ok: false, reason: "JSON parse error" };
   }
@@ -31,8 +47,14 @@ const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 function setup(extra: { staleTimeoutMs?: number; backoffBaseMs?: number } = {}) {
   const sockets: FakeSocket[] = [];
   const source = new WebSocketSource({
-    url: "ws://test", parse, ...extra,
-    createSocket: () => { const s = new FakeSocket(); sockets.push(s); return s; },
+    url: "ws://test",
+    parse,
+    ...extra,
+    createSocket: () => {
+      const s = new FakeSocket();
+      sockets.push(s);
+      return s;
+    },
   });
   const store = new TelemetryStore();
   store.setSource(source, "ws:test");
@@ -77,7 +99,9 @@ describe("WebSocketSource", () => {
     sockets[0]?.open();
     sockets[0]?.drop(1006);
     expect(store.getSnapshot().connection.state).toBe("reconnecting");
-    expect(store.getSnapshot().diagnostics.events.some((e) => e.type === "disconnected")).toBe(true);
+    expect(store.getSnapshot().diagnostics.events.some((e) => e.type === "disconnected")).toBe(
+      true,
+    );
     await wait(40);
     expect(sockets.length).toBe(2);
     sockets[1]?.open();

@@ -11,7 +11,7 @@ export interface SimulatorOptions {
 
 /** Generates plausible telemetry for every field, so the dashboard works without hardware. */
 export class SimulatorSource implements TelemetrySource {
-  readonly info = { kind: "simulator", label: "Simulator" } as const;
+  readonly info = { kind: "simulator", label: "Demo · Simulator" } as const;
   private current: Telemetry = initialTelemetry;
   private timer: ReturnType<typeof setInterval> | null = null;
   private readonly intervalMs: number;
@@ -31,7 +31,11 @@ export class SimulatorSource implements TelemetrySource {
     sink.setConnection("connected", "Simulated telemetry");
     this.timer = setInterval(() => {
       this.current = simulate(this.current, this.rand);
-      sink.publish({ fields: this.current, packetNo: this.current.packetCount, receivedAt: Date.now() });
+      sink.publish({
+        fields: this.current,
+        packetNo: this.current.packetCount,
+        receivedAt: Date.now(),
+      });
     }, this.intervalMs);
   }
 

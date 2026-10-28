@@ -16,13 +16,19 @@ export function recordsToCsv(records: readonly TelemetryRecord[]): string {
       const v = r.data[field];
       return v === undefined ? "" : String(v);
     });
-    return [r.receivedAt, new Date(r.receivedAt).toISOString(), r.packetNo ?? "", ...cells].join(",");
+    return [r.receivedAt, new Date(r.receivedAt).toISOString(), r.packetNo ?? "", ...cells].join(
+      ",",
+    );
   });
   return [header, ...rows].join("\n");
 }
 
 export function recordsToJson(records: readonly TelemetryRecord[]): string {
-  return JSON.stringify({ exportedAt: new Date().toISOString(), count: records.length, records }, null, 2);
+  return JSON.stringify(
+    { exportedAt: new Date().toISOString(), count: records.length, records },
+    null,
+    2,
+  );
 }
 
 /** Steps through stored records in order. Foundation for the future replay UI. */

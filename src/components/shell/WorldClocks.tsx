@@ -16,7 +16,17 @@ const ZONES: readonly ZoneSpec[] = [
 export function WorldClocks() {
   const now = useNow(1000);
   const formatters = useMemo(
-    () => ZONES.map((z) => new Intl.DateTimeFormat("en-GB", { timeZone: z.timeZone, hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false })),
+    () =>
+      ZONES.map(
+        (z) =>
+          new Intl.DateTimeFormat("en-GB", {
+            timeZone: z.timeZone,
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: false,
+          }),
+      ),
     [],
   );
   return (

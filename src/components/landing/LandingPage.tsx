@@ -2,7 +2,15 @@ import { Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { ArrowRight, Radio, Rocket, Satellite, Signal } from "lucide-react";
 import { mission } from "@/app/mission";
-import { BrandMark, ConnectionIndicator, Eyebrow, SkipLink, Surface, Widget, WidgetGrid } from "@/components/ds";
+import {
+  BrandMark,
+  ConnectionIndicator,
+  Eyebrow,
+  SkipLink,
+  Surface,
+  Widget,
+  WidgetGrid,
+} from "@/components/ds";
 import { Starfield } from "@/components/mission/Starfield";
 import { Button } from "@/components/ui/button";
 import { fadeUp } from "@/design/motion";
@@ -45,7 +53,10 @@ export function LandingPage() {
         </header>
 
         <main id="main" tabIndex={-1} className="page-container space-y-20 pb-20 outline-none">
-          <section aria-labelledby="hero-title" className="grid items-center gap-8 pt-6 lg:grid-cols-[1.05fr_0.95fr] lg:pt-12">
+          <section
+            aria-labelledby="hero-title"
+            className="grid items-center gap-8 pt-6 lg:grid-cols-[1.05fr_0.95fr] lg:pt-12"
+          >
             <div className="space-y-6">
               <motion.div {...fadeUp(0)} className="flex flex-wrap items-center gap-3">
                 <Eyebrow className="text-copper">{mission.name}</Eyebrow>
@@ -53,13 +64,20 @@ export function LandingPage() {
                 <Eyebrow>{mission.tagline}</Eyebrow>
               </motion.div>
 
-              <motion.h1 {...fadeUp(0.05)} id="hero-title" className="font-display text-4xl font-semibold leading-[1.05] tracking-tight sm:text-5xl lg:text-display">
+              <motion.h1
+                {...fadeUp(0.05)}
+                id="hero-title"
+                className="font-display text-4xl font-semibold leading-[1.05] tracking-tight sm:text-5xl lg:text-display"
+              >
                 <span className="glow-copper text-amber">Old Monk</span>
                 <br />
                 Mission Control
               </motion.h1>
 
-              <motion.p {...fadeUp(0.1)} className="max-w-xl text-base text-muted-foreground md:text-lg">
+              <motion.p
+                {...fadeUp(0.1)}
+                className="max-w-xl text-base text-muted-foreground md:text-lg"
+              >
                 {mission.description}
               </motion.p>
 
@@ -90,7 +108,9 @@ export function LandingPage() {
             <WidgetGrid>
               <Widget span="third" title="Ground Station" icon={<Radio className="h-4 w-4" />}>
                 <RadarSweep live={live} />
-                <p className="mt-3 text-center text-sm text-muted-foreground">{live ? "Link acquired" : "Searching for signal"}</p>
+                <p className="mt-3 text-center text-sm text-muted-foreground">
+                  {live ? "Link acquired" : "Searching for signal"}
+                </p>
               </Widget>
               <Widget span="third" title="Mission Countdown" icon={<Rocket className="h-4 w-4" />}>
                 <MissionCountdown target={mission.launchAt} />
@@ -101,14 +121,22 @@ export function LandingPage() {
             </WidgetGrid>
           </section>
 
-          <section id="about" aria-labelledby="about-title" className="grid gap-8 scroll-mt-8 lg:grid-cols-[0.8fr_1.2fr]">
+          <section
+            id="about"
+            aria-labelledby="about-title"
+            className="grid gap-8 scroll-mt-8 lg:grid-cols-[0.8fr_1.2fr]"
+          >
             <div className="space-y-3">
               <Eyebrow className="text-copper">About the mission</Eyebrow>
-              <h2 id="about-title" className="font-display text-2xl font-semibold tracking-tight md:text-3xl">
+              <h2
+                id="about-title"
+                className="font-display text-2xl font-semibold tracking-tight md:text-3xl"
+              >
                 From sensor to screen, in one console
               </h2>
               <p className="text-muted-foreground">
-                {mission.name} is a CubeSat telemetry project. This platform turns the raw packets from the satellite into live readings, a 3D attitude view, GPS tracking and link
+                {mission.name} is a CubeSat telemetry project. This platform turns the raw packets
+                from the satellite into live readings, a 3D attitude view, GPS tracking and link
                 diagnostics, so a team can judge the health of the mission at a glance.
               </p>
             </div>
@@ -116,7 +144,9 @@ export function LandingPage() {
               <ol className="space-y-4">
                 {DATA_PATH.map((step, i) => (
                   <li key={step.title} className="flex gap-4">
-                    <span className="num flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-border bg-surface-2 text-xs text-amber">{i + 1}</span>
+                    <span className="num flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-border bg-surface-2 text-xs text-amber">
+                      {i + 1}
+                    </span>
                     <div>
                       <p className="font-medium text-foreground">{step.title}</p>
                       <p className="text-sm text-muted-foreground">{step.detail}</p>
@@ -129,7 +159,9 @@ export function LandingPage() {
         </main>
 
         <footer className="page-container flex items-center justify-between border-t border-border py-6">
-          <p className="eyebrow">{mission.name} · {mission.title}</p>
+          <p className="eyebrow">
+            {mission.name} · {mission.title}
+          </p>
           <Satellite aria-hidden="true" className="h-4 w-4 text-muted-foreground" />
         </footer>
       </div>

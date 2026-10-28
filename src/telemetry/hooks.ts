@@ -60,8 +60,10 @@ export function useHistoryService() {
       records: () => store.getRecords(),
       exportCsv: () => store.exportCsv(),
       exportJson: () => store.exportJson(),
-      downloadCsv: (name = "orbitra-telemetry.csv") => downloadText(name, store.exportCsv(), "text/csv"),
-      downloadJson: (name = "orbitra-telemetry.json") => downloadText(name, store.exportJson(), "application/json"),
+      downloadCsv: (name = "orbitra-telemetry.csv") =>
+        downloadText(name, store.exportCsv(), "text/csv"),
+      downloadJson: (name = "orbitra-telemetry.json") =>
+        downloadText(name, store.exportJson(), "application/json"),
       createReplay: () => new HistoryReplay(store.getRecords().slice()),
     }),
     [store],

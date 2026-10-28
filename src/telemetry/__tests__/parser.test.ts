@@ -3,7 +3,17 @@ import { parseBridgePacket } from "../parser";
 
 describe("parseBridgePacket", () => {
   it("accepts a valid packet and normalises aliases", () => {
-    const r = parseBridgePacket(JSON.stringify({ packet: 7, temp: "27.5", hum: 51, lat: 28.6, lng: 77.2, accel_x: 0.1, roll: -507.4 }));
+    const r = parseBridgePacket(
+      JSON.stringify({
+        packet: 7,
+        temp: "27.5",
+        hum: 51,
+        lat: 28.6,
+        lng: 77.2,
+        accel_x: 0.1,
+        roll: -507.4,
+      }),
+    );
     expect(r.ok).toBe(true);
     if (!r.ok) return;
     expect(r.packetNo).toBe(7);
@@ -25,7 +35,9 @@ describe("parseBridgePacket", () => {
     expect(parseBridgePacket("not json").ok).toBe(false);
     expect(parseBridgePacket("[1,2]").ok).toBe(false);
     expect(parseBridgePacket(JSON.stringify({ packetNo: 3 })).ok).toBe(false);
-    expect(parseBridgePacket(JSON.stringify({ temperature: null, humidity: "abc" })).ok).toBe(false);
+    expect(parseBridgePacket(JSON.stringify({ temperature: null, humidity: "abc" })).ok).toBe(
+      false,
+    );
   });
 
   it("recognises heartbeats", () => {

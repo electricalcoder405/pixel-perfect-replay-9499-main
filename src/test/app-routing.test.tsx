@@ -21,9 +21,12 @@ describe("App routing", () => {
     expect(matchedRouteId("/dashboard")).toBe("/dashboard/");
   });
 
-  it.each(NAV_ITEMS.filter((item) => item.to !== "/dashboard").map((item) => [item.to]))("matches %s instead of falling back to not found", (path) => {
-    const id = matchedRouteId(path);
-    expect(id).toBe(path);
-    expect(id).not.toBe(rootRouteId);
-  });
+  it.each(NAV_ITEMS.filter((item) => item.to !== "/dashboard").map((item) => [item.to]))(
+    "matches %s instead of falling back to not found",
+    (path) => {
+      const id = matchedRouteId(path);
+      expect(id).toBe(path);
+      expect(id).not.toBe(rootRouteId);
+    },
+  );
 });

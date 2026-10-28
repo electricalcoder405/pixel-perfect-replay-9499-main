@@ -45,7 +45,7 @@ const CONNECTING = 0;
  * so this class stays correct whatever the bridge protocol turns out to be.
  */
 export class WebSocketSource implements TelemetrySource {
-  readonly info = { kind: "websocket", label: "Live · WebSocket" } as const;
+  readonly info = { kind: "websocket", label: "Ground Controller · Live" } as const;
 
   private sink: TelemetrySink | null = null;
   private socket: WebSocketLike | null = null;
@@ -123,7 +123,9 @@ export class WebSocketSource implements TelemetrySource {
 
     let socket: WebSocketLike;
     try {
-      socket = this.options.createSocket ? this.options.createSocket(this.options.url) : (new WebSocket(this.options.url) as unknown as WebSocketLike);
+      socket = this.options.createSocket
+        ? this.options.createSocket(this.options.url)
+        : (new WebSocket(this.options.url) as unknown as WebSocketLike);
     } catch (error) {
       this.setState("error", error instanceof Error ? error.message : String(error));
       this.scheduleReconnect();
@@ -221,9 +223,15 @@ export class WebSocketSource implements TelemetrySource {
   private scheduleReconnect(): void {
     if (!this.running) return;
     this.clearReconnectTimer();
-    const delay = Math.min(this.backoffBaseMs * Math.pow(this.backoffMultiplier, this.attempts), this.backoffMaxMs);
+    const delay = Math.min(
+      this.backoffBaseMs * Math.pow(this.backoffMultiplier, this.attempts),
+      this.backoffMaxMs,
+    );
     this.attempts += 1;
-    this.setState("reconnecting", `Reconnecting in ${Math.round(delay / 100) / 10} s (attempt ${this.attempts})`);
+    this.setState(
+      "reconnecting",
+      `Reconnecting in ${Math.round(delay / 100) / 10} s (attempt ${this.attempts})`,
+    );
     this.reconnectTimer = setTimeout(() => this.connect(), delay);
   }
 

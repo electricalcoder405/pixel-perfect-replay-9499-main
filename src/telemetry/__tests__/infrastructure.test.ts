@@ -21,7 +21,12 @@ describe("AlertManager", () => {
 describe("evaluateSensors", () => {
   it("reports awaiting, ok, offline and degraded GPS", () => {
     const available = new Set(["temperature", "latitude"] as const);
-    const fresh = evaluateSensors(available, { temperature: 9_000, latitude: 9_000 }, false, 10_000);
+    const fresh = evaluateSensors(
+      available,
+      { temperature: 9_000, latitude: 9_000 },
+      false,
+      10_000,
+    );
     expect(fresh.find((s) => s.id === "dht11")?.health).toBe("ok");
     expect(fresh.find((s) => s.id === "gps")?.health).toBe("degraded");
     expect(fresh.find((s) => s.id === "bmp280")?.health).toBe("awaiting");
@@ -36,14 +41,22 @@ describe("store infrastructure", () => {
     const source: TelemetrySource = {
       info: { kind: "websocket", label: "t" },
       getInitialSample: () => null,
-      start: (s) => { sink = s; },
+      start: (s) => {
+        sink = s;
+      },
       stop: () => {},
     };
     let clock = 10_000;
     const store = new TelemetryStore({ now: () => clock });
     store.setSource(source, "t");
     store.start();
-    return { store, sink: sink as unknown as TelemetrySink, advance: (ms: number) => { clock += ms; } };
+    return {
+      store,
+      sink: sink as unknown as TelemetrySink,
+      advance: (ms: number) => {
+        clock += ms;
+      },
+    };
   }
 
   it("tracks mission state and raises/resolves invalid-packet alerts", () => {
@@ -54,7 +67,9 @@ describe("store infrastructure", () => {
     expect(store.getSnapshot().mission.packetCount).toBe(1);
     expect(store.getSnapshot().mission.status).toBe("active");
     sink.reportInvalid("bad");
-    expect(store.getSnapshot().alerts.some((a) => a.kind === "invalid-packet" && a.resolvedAt === null)).toBe(true);
+    expect(
+      store.getSnapshot().alerts.some((a) => a.kind === "invalid-packet" && a.resolvedAt === null),
+    ).toBe(true);
     sink.publish({ fields: { temperature: 21 }, packetNo: 2, receivedAt: 10_000 });
     expect(store.getSnapshot().alerts.every((a) => a.resolvedAt !== null)).toBe(true);
     store.stop();

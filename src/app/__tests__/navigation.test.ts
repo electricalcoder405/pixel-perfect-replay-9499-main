@@ -29,7 +29,13 @@ describe("getCountdown", () => {
   });
   it("splits time remaining into days, hours, minutes, seconds", () => {
     const target = new Date(now.getTime() + ((2 * 24 + 3) * 3600 + 4 * 60 + 5) * 1000);
-    expect(getCountdown(target, now)).toEqual({ state: "before", days: 2, hours: 3, minutes: 4, seconds: 5 });
+    expect(getCountdown(target, now)).toEqual({
+      state: "before",
+      days: 2,
+      hours: 3,
+      minutes: 4,
+      seconds: 5,
+    });
   });
   it("reports elapsed time after the target", () => {
     const target = new Date(now.getTime() - 90_000);

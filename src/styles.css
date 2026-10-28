@@ -75,10 +75,10 @@
   --text-display: 3rem;
   --text-display--line-height: 1;
 
-  /* Shadows and glows */
-  --shadow-glow-cyan: 0 0 24px -8px var(--cyan);
-  --shadow-glow-amber: 0 0 24px -8px var(--amber);
-  --shadow-panel: inset 0 1px 0 oklch(1 0 0 / 5%), 0 1px 2px oklch(0 0 0 / 40%);
+  /* Shadows and subtle glows - refined for clean aerospace look */
+  --shadow-glow-cyan: 0 2px 14px -6px color-mix(in oklab, var(--cyan) 35%, transparent);
+  --shadow-glow-amber: 0 2px 14px -6px color-mix(in oklab, var(--amber) 35%, transparent);
+  --shadow-panel: inset 0 1px 0 oklch(1 0 0 / 4%), 0 2px 8px oklch(0 0 0 / 45%);
 
   /* Motion */
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
@@ -96,7 +96,7 @@
   --surface-3: oklch(0.25 0.01 60);
 
   --foreground: oklch(0.96 0.006 80);
-  --card: oklch(0.18 0.007 60 / 55%);
+  --card: oklch(0.16 0.006 60 / 96%);
   --card-foreground: oklch(0.96 0.006 80);
   --popover: oklch(0.17 0.007 60);
   --popover-foreground: oklch(0.96 0.006 80);
@@ -129,17 +129,28 @@
 }
 
 @layer base {
-  * { border-color: var(--color-border); }
-  html { color-scheme: dark; -webkit-text-size-adjust: 100%; }
+  * {
+    border-color: var(--color-border);
+  }
+  html {
+    background-color: #07090e;
+    color-scheme: dark;
+    -webkit-text-size-adjust: 100%;
+  }
   body {
-    background-color: var(--color-background);
+    background-color: transparent;
     color: var(--color-foreground);
     font-family: var(--font-sans);
     font-feature-settings: "cv11", "ss01";
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
-  h1, h2, h3, h4 { font-family: var(--font-display); }
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+  }
 
   /* Keyboard focus is always visible and never relies on colour alone. */
   :focus-visible {
@@ -147,16 +158,20 @@
     outline-offset: 2px;
     border-radius: var(--radius-sm);
   }
-  ::selection { background: color-mix(in oklab, var(--amber) 35%, transparent); }
+  ::selection {
+    background: color-mix(in oklab, var(--amber) 35%, transparent);
+  }
 }
 
 /* Surfaces */
 @utility glass {
-  background: linear-gradient(145deg, oklch(0.21 0.009 60 / 60%), oklch(0.14 0.005 60 / 45%));
-  backdrop-filter: blur(16px) saturate(130%);
-  border: 1px solid var(--border);
+  background: linear-gradient(160deg, oklch(0.16 0.006 60 / 95%), oklch(0.12 0.004 60 / 97%));
+  backdrop-filter: blur(8px);
+  border: 1px solid oklch(0.82 0.08 70 / 12%);
   border-radius: var(--radius-xl);
-  box-shadow: inset 0 1px 0 oklch(1 0 0 / 5%), 0 0 24px -14px var(--copper);
+  box-shadow:
+    inset 0 1px 0 oklch(1 0 0 / 4%),
+    0 4px 16px -6px oklch(0 0 0 / 50%);
 }
 @utility surface-solid {
   background: var(--surface-1);
@@ -176,13 +191,21 @@
   width: 100%;
   max-width: 100rem;
   padding-inline: 1rem;
-  @media (min-width: 768px) { padding-inline: 1.5rem; }
+  @media (min-width: 768px) {
+    padding-inline: 1.5rem;
+  }
 }
 
 /* Text */
-@utility glow-amber { text-shadow: 0 0 18px color-mix(in oklab, var(--amber) 55%, transparent); }
-@utility glow-copper { text-shadow: 0 0 18px color-mix(in oklab, var(--copper) 60%, transparent); }
-@utility glow-cyan { text-shadow: 0 0 14px color-mix(in oklab, var(--cyan) 60%, transparent); }
+@utility glow-amber {
+  text-shadow: 0 0 8px color-mix(in oklab, var(--amber) 30%, transparent);
+}
+@utility glow-copper {
+  text-shadow: 0 0 8px color-mix(in oklab, var(--copper) 30%, transparent);
+}
+@utility glow-cyan {
+  text-shadow: 0 0 8px color-mix(in oklab, var(--cyan) 30%, transparent);
+}
 @utility eyebrow {
   font-family: var(--font-data);
   font-size: var(--text-2xs);
@@ -200,9 +223,12 @@
 
 /* Indicators and decoration */
 @utility led {
-  width: 0.5rem; height: 0.5rem; border-radius: 9999px;
-  background: currentColor; box-shadow: 0 0 10px currentColor;
-  animation: pulse-led 1.6s ease-in-out infinite;
+  width: 0.4375rem;
+  height: 0.4375rem;
+  border-radius: 9999px;
+  background: currentColor;
+  box-shadow: 0 0 4px color-mix(in oklab, currentColor 50%, transparent);
+  animation: pulse-led 1.8s ease-in-out infinite;
 }
 @utility ping-ring {
   transform-box: fill-box;
@@ -213,18 +239,42 @@
   background-image: repeating-linear-gradient(0deg, oklch(1 0 0 / 2%) 0 1px, transparent 1px 3px);
 }
 
-@keyframes pulse-led { 50% { opacity: 0.45; } }
-@keyframes spin-slow { to { transform: rotate(360deg); } }
-@keyframes earth-scroll { to { background-position: -200% 0; } }
-@keyframes shimmer { to { background-position: -200% 0; } }
+@keyframes pulse-led {
+  50% {
+    opacity: 0.45;
+  }
+}
+@keyframes spin-slow {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes earth-scroll {
+  to {
+    background-position: -200% 0;
+  }
+}
+@keyframes shimmer {
+  to {
+    background-position: -200% 0;
+  }
+}
 @keyframes ping-ring {
-  from { transform: scale(1); opacity: 0.7; }
-  to { transform: scale(4.5); opacity: 0; }
+  from {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  to {
+    transform: scale(4.5);
+    opacity: 0;
+  }
 }
 
 /* Users who ask for less motion get none of the looping decoration. */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;

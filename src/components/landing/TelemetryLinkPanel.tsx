@@ -10,12 +10,21 @@ export function TelemetryLinkPanel() {
       <ConnectionIndicator />
       <dl className="grid grid-cols-2 gap-3">
         <div className="surface-inset p-3">
-          <dt><Eyebrow>Packets</Eyebrow></dt>
-          <dd className="num text-metric-sm font-semibold text-foreground">{packets.toLocaleString("en-GB")}</dd>
+          <dt>
+            <Eyebrow>Packets</Eyebrow>
+          </dt>
+          <dd className="num text-metric-sm font-semibold text-foreground">
+            {packets.toLocaleString("en-GB")}
+          </dd>
         </div>
         <div className="surface-inset p-3">
-          <dt><Eyebrow>Rate</Eyebrow></dt>
-          <dd className="num text-metric-sm font-semibold text-foreground">{rate.toFixed(1)}<span className="ml-1 text-2xs font-normal text-muted-foreground">/s</span></dd>
+          <dt>
+            <Eyebrow>Rate</Eyebrow>
+          </dt>
+          <dd className="num text-metric-sm font-semibold text-foreground">
+            {rate.toFixed(1)}
+            <span className="ml-1 text-2xs font-normal text-muted-foreground">/s</span>
+          </dd>
         </div>
       </dl>
     </div>

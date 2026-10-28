@@ -10,5 +10,7 @@ export { StatusBadge } from "./StatusBadge";
 export { StatusDot } from "./StatusDot";
 export { Surface } from "./Surface";
 export type { SurfaceProps } from "./Surface";
+export { OldMonkBottleSilhouette, OldMonkChartMarker } from "./OldMonkBottleMarker";
+export { WaitingForGroundBanner } from "./WaitingForGroundBanner";
 export { Widget, WidgetGrid, WidgetSkeleton } from "./Widget";
 export type { WidgetProps, WidgetSpan, WidgetState } from "./Widget";

@@ -16,7 +16,20 @@ export interface SensorDefinition {
 
 export const SENSORS: readonly SensorDefinition[] = [
   { id: "dht11", label: "DHT11", fields: ["temperature", "humidity"] },
-  { id: "mpu6050", label: "MPU6050", fields: ["accelerationX", "accelerationY", "accelerationZ", "gyroX", "gyroY", "gyroZ", "roll", "pitch"] },
+  {
+    id: "mpu6050",
+    label: "MPU6050",
+    fields: [
+      "accelerationX",
+      "accelerationY",
+      "accelerationZ",
+      "gyroX",
+      "gyroY",
+      "gyroZ",
+      "roll",
+      "pitch",
+    ],
+  },
   { id: "bmp280", label: "BMP280", fields: ["pressure"] },
   { id: "gps", label: "GPS", fields: ["latitude", "longitude", "gpsFix"] },
 ];
@@ -24,7 +37,11 @@ export const SENSORS: readonly SensorDefinition[] = [
 /** online: data is arriving. no-fix: GPS is reporting but has no position fix. awaiting: nothing received yet. */
 export type SensorStatus = "online" | "no-fix" | "awaiting";
 
-export function getSensorStatus(sensor: SensorDefinition, available: ReadonlySet<TelemetryField>, gpsFix: boolean): SensorStatus {
+export function getSensorStatus(
+  sensor: SensorDefinition,
+  available: ReadonlySet<TelemetryField>,
+  gpsFix: boolean,
+): SensorStatus {
   if (!sensor.fields.some((field) => available.has(field))) return "awaiting";
   if (sensor.id === "gps" && !gpsFix) return "no-fix";
   return "online";

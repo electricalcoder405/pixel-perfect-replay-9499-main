@@ -61,7 +61,7 @@ function earthTexture(): THREE.CanvasTexture {
     g.fillRect(0, 0, w, h);
 
     let seed = 7;
-    const rand = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+    const rand = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
     g.fillStyle = "#2f6b3f";
     for (let i = 0; i < 46; i++) {
       const cx = rand() * w;
@@ -81,8 +81,18 @@ function earthTexture(): THREE.CanvasTexture {
     g.globalAlpha = 0.18;
     g.strokeStyle = CYAN;
     g.lineWidth = 1;
-    for (let x = 0; x <= w; x += w / 24) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, h); g.stroke(); }
-    for (let y = 0; y <= h; y += h / 12) { g.beginPath(); g.moveTo(0, y); g.lineTo(w, y); g.stroke(); }
+    for (let x = 0; x <= w; x += w / 24) {
+      g.beginPath();
+      g.moveTo(x, 0);
+      g.lineTo(x, h);
+      g.stroke();
+    }
+    for (let y = 0; y <= h; y += h / 12) {
+      g.beginPath();
+      g.moveTo(0, y);
+      g.lineTo(w, y);
+      g.stroke();
+    }
     g.globalAlpha = 1;
   }
   const t = new THREE.CanvasTexture(c);
@@ -91,7 +101,13 @@ function earthTexture(): THREE.CanvasTexture {
 }
 
 /** The spacecraft. Its rotation follows the telemetry attitude, smoothed between packets. */
-function Spacecraft({ attitude, scale = 1 }: { attitude: React.RefObject<Attitude>; scale?: number }) {
+function Spacecraft({
+  attitude,
+  scale = 1,
+}: {
+  attitude: React.RefObject<Attitude>;
+  scale?: number;
+}) {
   const group = useRef<THREE.Group>(null);
   const tex = useMemo(panelTexture, []);
   useFrame((_, delta) => {
@@ -101,7 +117,10 @@ function Spacecraft({ attitude, scale = 1 }: { attitude: React.RefObject<Attitud
     const a = attitude.current;
     g.rotation.x += (THREE.MathUtils.degToRad(a.pitch) - g.rotation.x) * k;
     g.rotation.z += (THREE.MathUtils.degToRad(a.roll) - g.rotation.z) * k;
-    const dy = Math.atan2(Math.sin(THREE.MathUtils.degToRad(a.yaw) - g.rotation.y), Math.cos(THREE.MathUtils.degToRad(a.yaw) - g.rotation.y));
+    const dy = Math.atan2(
+      Math.sin(THREE.MathUtils.degToRad(a.yaw) - g.rotation.y),
+      Math.cos(THREE.MathUtils.degToRad(a.yaw) - g.rotation.y),
+    );
     g.rotation.y += dy * k;
   });
 
@@ -113,7 +132,13 @@ function Spacecraft({ attitude, scale = 1 }: { attitude: React.RefObject<Attitud
       </mesh>
       <mesh rotation={[0, 0, Math.PI / 2]}>
         <boxGeometry args={[1.8, 0.04, 0.95]} />
-        <meshStandardMaterial map={tex} metalness={0.6} roughness={0.25} emissive="#0a3080" emissiveIntensity={0.25} />
+        <meshStandardMaterial
+          map={tex}
+          metalness={0.6}
+          roughness={0.25}
+          emissive="#0a3080"
+          emissiveIntensity={0.25}
+        />
         <Edges color={CYAN} />
       </mesh>
     </group>
@@ -168,7 +193,14 @@ function Earth() {
       </mesh>
       <mesh>
         <sphereGeometry args={[EARTH_RADIUS * 1.035, 48, 48]} />
-        <meshBasicMaterial color={CYAN} transparent opacity={0.12} side={THREE.BackSide} blending={THREE.AdditiveBlending} depthWrite={false} />
+        <meshBasicMaterial
+          color={CYAN}
+          transparent
+          opacity={0.12}
+          side={THREE.BackSide}
+          blending={THREE.AdditiveBlending}
+          depthWrite={false}
+        />
       </mesh>
     </group>
   );
@@ -177,15 +209,25 @@ function Earth() {
 /** Illustrative circular orbit. It is not computed from telemetry: the hardware reports no orbital elements. */
 function OrbitPath() {
   const points = useMemo(
-    () => Array.from({ length: 129 }, (_, i) => {
-      const a = (i / 128) * Math.PI * 2;
-      return new THREE.Vector3(Math.cos(a) * ORBIT_RADIUS, 0, Math.sin(a) * ORBIT_RADIUS);
-    }),
+    () =>
+      Array.from({ length: 129 }, (_, i) => {
+        const a = (i / 128) * Math.PI * 2;
+        return new THREE.Vector3(Math.cos(a) * ORBIT_RADIUS, 0, Math.sin(a) * ORBIT_RADIUS);
+      }),
     [],
   );
   return (
     <group rotation={[ORBIT_TILT, 0, 0]}>
-      <Line points={points} color={AMBER} lineWidth={1.2} transparent opacity={0.7} dashed dashSize={0.18} gapSize={0.12} />
+      <Line
+        points={points}
+        color={AMBER}
+        lineWidth={1.2}
+        transparent
+        opacity={0.7}
+        dashed
+        dashSize={0.18}
+        gapSize={0.12}
+      />
     </group>
   );
 }
@@ -210,7 +252,10 @@ function OrbitingSpacecraft({ attitude }: { attitude: React.RefObject<Attitude> 
 /** Moves the camera when the view mode changes or the user presses Reset. */
 function CameraRig({ mode, resetKey }: { mode: SceneMode; resetKey: number }) {
   const camera = useThree((s) => s.camera);
-  const controls = useThree((s) => s.controls) as unknown as { target: THREE.Vector3; update: () => void } | null;
+  const controls = useThree((s) => s.controls) as unknown as {
+    target: THREE.Vector3;
+    update: () => void;
+  } | null;
   useEffect(() => {
     if (mode === "orbit") camera.position.set(0, 3.2, 8.5);
     else camera.position.set(2.6, 1.6, 5.2);
@@ -222,11 +267,24 @@ function CameraRig({ mode, resetKey }: { mode: SceneMode; resetKey: number }) {
   return null;
 }
 
-export function SatelliteScene({ attitude, mode, resetKey }: { attitude: Attitude; mode: SceneMode; resetKey: number }) {
+export function SatelliteScene({
+  attitude,
+  mode,
+  resetKey,
+}: {
+  attitude: Attitude;
+  mode: SceneMode;
+  resetKey: number;
+}) {
   const ref = useRef<Attitude>(attitude);
   ref.current = attitude;
   return (
-    <Canvas camera={{ position: [0, 3.2, 8.5], fov: 45 }} dpr={[1, 2]} gl={{ antialias: true }} aria-label="Interactive 3D satellite view">
+    <Canvas
+      camera={{ position: [0, 3.2, 8.5], fov: 45 }}
+      dpr={[1, 2]}
+      gl={{ antialias: true }}
+      aria-label="Interactive 3D satellite view"
+    >
       <color attach="background" args={["#05070d"]} />
       <Stars radius={90} depth={50} count={3500} factor={4} saturation={0} fade speed={0.6} />
       <ambientLight intensity={0.45} />
@@ -242,12 +300,20 @@ export function SatelliteScene({ attitude, mode, resetKey }: { attitude: Attitud
         </>
       ) : (
         <>
-          <group position={[-7, -3.5, -12]} scale={1.1}><Earth /></group>
+          <group position={[-7, -3.5, -12]} scale={1.1}>
+            <Earth />
+          </group>
           <Spacecraft attitude={ref} scale={1} />
         </>
       )}
 
-      <OrbitControls makeDefault enablePan={false} enableDamping minDistance={mode === "orbit" ? 4.5 : 2.5} maxDistance={20} />
+      <OrbitControls
+        makeDefault
+        enablePan={false}
+        enableDamping
+        minDistance={mode === "orbit" ? 4.5 : 2.5}
+        maxDistance={20}
+      />
       <CameraRig mode={mode} resetKey={resetKey} />
     </Canvas>
   );

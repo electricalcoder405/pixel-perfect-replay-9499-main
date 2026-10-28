@@ -2,7 +2,7 @@ import { Outlet } from "@tanstack/react-router";
 import { AnimatePresence } from "framer-motion";
 import { useCallback, useState } from "react";
 import { Loader } from "@/components/mission/Loader";
-import { Starfield } from "@/components/mission/Starfield";
+import { BackgroundLayer } from "./BackgroundLayer";
 import { AppShell } from "./AppShell";
 
 /** The boot sequence plays once per page load, not on every navigation inside the dashboard. */
@@ -17,7 +17,7 @@ export function DashboardLayout() {
 
   return (
     <>
-      <Starfield />
+      <BackgroundLayer />
       <AnimatePresence>{booting && <Loader onDone={finishBoot} />}</AnimatePresence>
       {!booting && (
         <AppShell>

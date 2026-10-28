@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { pageTitle } from "@/app/mission";
-import { ModulePage } from "@/components/shell/ModulePage";
+import { GroundStationPage } from "@/components/groundstation/GroundStationPage";
 
 export const Route = createFileRoute("/dashboard/ground-station")({
   head: () => ({ meta: [{ title: pageTitle("Ground Station") }] }),
-  component: () => <ModulePage section="ground-station" />,
+  component: GroundStationPage,
 });

@@ -7,9 +7,15 @@ import type { TelemetrySink, TelemetrySource } from "../sources/types";
 class ManualSource implements TelemetrySource {
   readonly info = { kind: "websocket", label: "Manual" } as const;
   sink: TelemetrySink | null = null;
-  getInitialSample() { return null; }
-  start(sink: TelemetrySink) { this.sink = sink; }
-  stop() { this.sink = null; }
+  getInitialSample() {
+    return null;
+  }
+  start(sink: TelemetrySink) {
+    this.sink = sink;
+  }
+  stop() {
+    this.sink = null;
+  }
 }
 
 function liveStore() {
@@ -62,7 +68,11 @@ describe("TelemetryStore (live-style source)", () => {
 
   it("forces no GPS fix at (0, 0) even if the source claims a fix", () => {
     const { store, sink } = liveStore();
-    sink.publish({ fields: { latitude: 0, longitude: 0, gpsFix: true }, packetNo: 1, receivedAt: 1 });
+    sink.publish({
+      fields: { latitude: 0, longitude: 0, gpsFix: true },
+      packetNo: 1,
+      receivedAt: 1,
+    });
     expect(store.getSnapshot().data.gpsFix).toBe(false);
   });
 
@@ -74,7 +84,8 @@ describe("TelemetryStore (live-style source)", () => {
 
   it("treats a packet counter decrease as a receiver restart, not loss", () => {
     const { store, sink } = liveStore();
-    for (const n of [10, 11, 12, 1, 2]) sink.publish({ fields: { temperature: 20 }, packetNo: n, receivedAt: n });
+    for (const n of [10, 11, 12, 1, 2])
+      sink.publish({ fields: { temperature: 20 }, packetNo: n, receivedAt: n });
     const d = store.getSnapshot().diagnostics;
     expect(d.restarts).toBe(1);
     expect(d.missed).toBe(0);
@@ -84,7 +95,8 @@ describe("TelemetryStore (live-style source)", () => {
 
   it("records real packet loss", () => {
     const { store, sink } = liveStore();
-    for (const n of [1, 2, 6]) sink.publish({ fields: { temperature: 20 }, packetNo: n, receivedAt: n });
+    for (const n of [1, 2, 6])
+      sink.publish({ fields: { temperature: 20 }, packetNo: n, receivedAt: n });
     expect(store.getSnapshot().diagnostics.missed).toBe(3);
   });
 
@@ -124,7 +136,9 @@ describe("TelemetryStore (live-style source)", () => {
   it("notifies subscribers and returns a new snapshot only when something changed", () => {
     const { store, sink } = liveStore();
     let calls = 0;
-    const unsubscribe = store.subscribe(() => { calls += 1; });
+    const unsubscribe = store.subscribe(() => {
+      calls += 1;
+    });
     const before = store.getSnapshot();
     expect(store.getSnapshot()).toBe(before);
     sink.publish({ fields: { temperature: 20 }, packetNo: 1, receivedAt: 1 });
@@ -138,7 +152,8 @@ describe("TelemetryStore (live-style source)", () => {
     const store = new TelemetryStore({ historyCapacity: 5, historyView: 3 });
     store.setSource(source, "m");
     store.start();
-    for (let i = 1; i <= 10; i++) source.sink?.publish({ fields: { temperature: i }, packetNo: i, receivedAt: i });
+    for (let i = 1; i <= 10; i++)
+      source.sink?.publish({ fields: { temperature: i }, packetNo: i, receivedAt: i });
     expect(store.getHistory()).toHaveLength(5);
     expect(store.getSnapshot().history).toHaveLength(3);
   });

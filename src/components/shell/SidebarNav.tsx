@@ -15,10 +15,17 @@ export function SidebarNav({ compact, onNavigate }: { compact: boolean; onNaviga
   const label = compact ? "max-lg:sr-only" : "";
   return (
     <div className="flex h-full flex-col">
-      <div className={cn("flex items-center gap-3 px-4 py-5", compact && "max-lg:justify-center max-lg:px-0")}>
+      <div
+        className={cn(
+          "flex items-center gap-3 px-4 py-5",
+          compact && "max-lg:justify-center max-lg:px-0",
+        )}
+      >
         <BrandMark label={mission.name} className="h-9 w-9" />
         <div className={cn("min-w-0", label)}>
-          <p className="font-display text-base font-semibold leading-tight tracking-wide text-foreground">{mission.name}</p>
+          <p className="font-display text-base font-semibold leading-tight tracking-wide text-foreground">
+            {mission.name}
+          </p>
           <p className="eyebrow text-copper">Mission Control</p>
         </div>
       </div>
@@ -27,7 +34,9 @@ export function SidebarNav({ compact, onNavigate }: { compact: boolean; onNaviga
         {NAV_GROUPS.map((group) => (
           <div key={group.label} className="mt-4 first:mt-0">
             <p className={cn("eyebrow px-3 pb-1.5", label)}>{group.label}</p>
-            {compact && <div aria-hidden="true" className="mx-3 mb-2 hidden h-px bg-border max-lg:block" />}
+            {compact && (
+              <div aria-hidden="true" className="mx-3 mb-2 hidden h-px bg-border max-lg:block" />
+            )}
             <ul className="space-y-0.5">
               {group.items.map((item) => {
                 const Icon = NAV_ICONS[item.id];

@@ -12,8 +12,24 @@ export function BrandMark({ className, label }: { className?: string; label?: st
       fill="none"
       {...(label ? { role: "img", "aria-label": label } : { "aria-hidden": true })}
     >
-      <circle cx="24" cy="24" r="9" fill="var(--surface-2)" stroke="var(--copper)" strokeWidth="1.5" />
-      <ellipse cx="24" cy="24" rx="20" ry="7.5" transform="rotate(-24 24 24)" stroke="var(--purple)" strokeOpacity="0.8" strokeWidth="1.25" />
+      <circle
+        cx="24"
+        cy="24"
+        r="9"
+        fill="var(--surface-2)"
+        stroke="var(--copper)"
+        strokeWidth="1.5"
+      />
+      <ellipse
+        cx="24"
+        cy="24"
+        rx="20"
+        ry="7.5"
+        transform="rotate(-24 24 24)"
+        stroke="var(--purple)"
+        strokeOpacity="0.8"
+        strokeWidth="1.25"
+      />
       <circle cx="39.5" cy="16.5" r="2.6" fill="var(--amber)" />
     </svg>
   );

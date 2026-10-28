@@ -125,6 +125,7 @@ export class TelemetryStore {
    * Pure with respect to the outside world: nothing starts until `start()`.
    */
   setSource(source: TelemetrySource, key: string): void {
+    const wasRunning = this.running;
     this.stop();
     this.source = source;
     this.key = key;
@@ -154,6 +155,9 @@ export class TelemetryStore {
       source: source.info,
     });
     this.emit();
+    if (wasRunning) {
+      this.start();
+    }
   }
 
   start(): void {
@@ -196,7 +200,11 @@ export class TelemetryStore {
     const prev = this.snapshot.connection;
     if (prev.state === state && prev.detail === (detail ?? null)) return;
     const at = this.now();
-    const connection: ConnectionStatus = { state, detail: detail ?? null, since: prev.state === state ? prev.since : at };
+    const connection: ConnectionStatus = {
+      state,
+      detail: detail ?? null,
+      since: prev.state === state ? prev.since : at,
+    };
 
     const type = eventTypeFor(state);
     if (type && prev.state !== state) this.pushEvent({ at, type, detail: detail ?? "" });
@@ -207,9 +215,17 @@ export class TelemetryStore {
 
   private handleInvalid(reason: string): void {
     this.invalid += 1;
-    this.validationErrors = [`[${new Date(this.now()).toISOString()}] ${reason}`, ...this.validationErrors].slice(0, MAX_ERRORS);
+    this.validationErrors = [
+      `[${new Date(this.now()).toISOString()}] ${reason}`,
+      ...this.validationErrors,
+    ].slice(0, MAX_ERRORS);
     this.alertManager.raise(
-      { kind: "invalid-packet", key: "invalid-packet", level: "warning", message: `${this.invalid} invalid packet${this.invalid === 1 ? "" : "s"} rejected: ${reason}` },
+      {
+        kind: "invalid-packet",
+        key: "invalid-packet",
+        level: "warning",
+        message: `${this.invalid} invalid packet${this.invalid === 1 ? "" : "s"} rejected: ${reason}`,
+      },
       this.now(),
     );
     this.snapshot = this.buildSnapshot({ ...this.snapshot });
@@ -252,10 +268,12 @@ export class TelemetryStore {
     if (this.missionStart === null) this.missionStart = sample.receivedAt;
     this.alertManager.resolve("invalid-packet", now);
     this.records.push({ receivedAt: sample.receivedAt, packetNo: sample.packetNo, data });
-    if (this.records.length > this.historyCapacity) this.records.splice(0, this.records.length - this.historyCapacity);
+    if (this.records.length > this.historyCapacity)
+      this.records.splice(0, this.records.length - this.historyCapacity);
 
     this.buffer.push(toHistoryPoint(data, sample.receivedAt));
-    if (this.buffer.length > this.historyCapacity) this.buffer.splice(0, this.buffer.length - this.historyCapacity);
+    if (this.buffer.length > this.historyCapacity)
+      this.buffer.splice(0, this.buffer.length - this.historyCapacity);
 
     this.snapshot = this.buildSnapshot({
       ...this.snapshot,
@@ -290,9 +308,17 @@ export class TelemetryStore {
     if (packetNo === null || !Number.isInteger(packetNo) || packetNo < 0) return;
     const event = this.tracker.observe(packetNo);
     if (event.kind === "restart") {
-      this.pushEvent({ at, type: "receiver-restart", detail: `Packet counter reset (was ${event.previous}, now ${packetNo})` });
+      this.pushEvent({
+        at,
+        type: "receiver-restart",
+        detail: `Packet counter reset (was ${event.previous}, now ${packetNo})`,
+      });
     } else if (event.kind === "gap") {
-      this.pushEvent({ at, type: "packet-gap", detail: `${event.missed} packet${event.missed === 1 ? "" : "s"} missed before #${packetNo}` });
+      this.pushEvent({
+        at,
+        type: "packet-gap",
+        detail: `${event.missed} packet${event.missed === 1 ? "" : "s"} missed before #${packetNo}`,
+      });
     }
   }
 
@@ -336,33 +362,78 @@ export class TelemetryStore {
       connection: base.connection,
       now,
     });
-    return { ...base, diagnostics, sensors: this.sensorCache, mission, alerts: this.alertManager.list };
+    return {
+      ...base,
+      diagnostics,
+      sensors: this.sensorCache,
+      mission,
+      alerts: this.alertManager.list,
+    };
   }
 
   /** Raises or resolves alerts from the current sensor and connection state. */
-  private syncAlerts(sensors: readonly SensorState[], connection: ConnectionStatus, now: number): void {
+  private syncAlerts(
+    sensors: readonly SensorState[],
+    connection: ConnectionStatus,
+    now: number,
+  ): void {
     const alerts = this.alertManager;
     for (const sensor of sensors) {
       const key = `sensor:${sensor.id}`;
       if (sensor.health === "offline") {
-        alerts.raise({ kind: "sensor-disconnected", key, level: "warning", message: `${sensor.label} stopped reporting` }, now);
+        alerts.raise(
+          {
+            kind: "sensor-disconnected",
+            key,
+            level: "warning",
+            message: `${sensor.label} stopped reporting`,
+          },
+          now,
+        );
       } else {
         alerts.resolve(key, now);
       }
       if (sensor.id === "gps") {
-        if (sensor.health === "degraded") alerts.raise({ kind: "gps-lost", key: "gps-lost", level: "warning", message: "GPS has no position fix" }, now);
+        if (sensor.health === "degraded")
+          alerts.raise(
+            {
+              kind: "gps-lost",
+              key: "gps-lost",
+              level: "warning",
+              message: "GPS has no position fix",
+            },
+            now,
+          );
         else alerts.resolve("gps-lost", now);
       }
     }
 
     if (connection.state === "disconnected" || connection.state === "error") {
-      alerts.raise({ kind: "connection-lost", key: "connection-lost", level: "critical", message: connection.detail ? `Telemetry link lost (${connection.detail})` : "Telemetry link lost" }, now);
+      alerts.raise(
+        {
+          kind: "connection-lost",
+          key: "connection-lost",
+          level: "critical",
+          message: connection.detail
+            ? `Telemetry link lost (${connection.detail})`
+            : "Telemetry link lost",
+        },
+        now,
+      );
     } else if (connection.state === "connected") {
       alerts.resolve("connection-lost", now);
     }
 
     if (connection.state === "stale") {
-      alerts.raise({ kind: "packet-timeout", key: "packet-timeout", level: "warning", message: connection.detail ?? "No packets received recently" }, now);
+      alerts.raise(
+        {
+          kind: "packet-timeout",
+          key: "packet-timeout",
+          level: "warning",
+          message: connection.detail ?? "No packets received recently",
+        },
+        now,
+      );
     } else if (connection.state === "connected") {
       alerts.resolve("packet-timeout", now);
     }
@@ -375,23 +446,42 @@ export class TelemetryStore {
 
 function eventTypeFor(state: ConnectionState): TelemetryEvent["type"] | null {
   switch (state) {
-    case "connected": return "connected";
-    case "stale": return "stale";
-    case "disconnected": return "disconnected";
-    case "error": return "error";
-    case "reconnecting": return "reconnecting";
-    case "connecting": return null;
-    case "idle": return null;
+    case "connected":
+    case "receiving":
+      return "connected";
+    case "stale":
+      return "stale";
+    case "disconnected":
+      return "disconnected";
+    case "error":
+      return "error";
+    case "reconnecting":
+      return "reconnecting";
+    case "connecting":
+    case "waiting":
+    case "idle":
+    default:
+      return null;
   }
 }
 
 function toHistoryPoint(d: Telemetry, ts: number): HistoryPoint {
   const r = (n: number) => +n.toFixed(2);
   return {
-    t: d.missionTime, ts,
-    temperature: r(d.temperature), pressure: r(d.pressure), humidity: r(d.humidity),
-    ax: +d.accelerationX.toFixed(3), ay: +d.accelerationY.toFixed(3), az: +d.accelerationZ.toFixed(3),
-    gx: r(d.gyroX), gy: r(d.gyroY), gz: r(d.gyroZ),
-    roll: r(d.roll), pitch: r(d.pitch), rollRaw: r(d.rollRaw), pitchRaw: r(d.pitchRaw),
+    t: d.missionTime,
+    ts,
+    temperature: r(d.temperature),
+    pressure: r(d.pressure),
+    humidity: r(d.humidity),
+    ax: +d.accelerationX.toFixed(3),
+    ay: +d.accelerationY.toFixed(3),
+    az: +d.accelerationZ.toFixed(3),
+    gx: r(d.gyroX),
+    gy: r(d.gyroY),
+    gz: r(d.gyroZ),
+    roll: r(d.roll),
+    pitch: r(d.pitch),
+    rollRaw: r(d.rollRaw),
+    pitchRaw: r(d.pitchRaw),
   };
 }

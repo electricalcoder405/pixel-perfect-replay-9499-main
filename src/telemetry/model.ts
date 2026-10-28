@@ -45,22 +45,58 @@ export interface Telemetry {
 export type TelemetryField = keyof Telemetry;
 
 export const initialTelemetry: Telemetry = {
-  temperature: 24.6, humidity: 48, pressure: 1008.4, altitude: 41,
-  latitude: 28.6139, longitude: 77.209,
-  accelerationX: 0.002 * ACCEL.gravity, accelerationY: -0.001 * ACCEL.gravity, accelerationZ: ACCEL.gravity,
-  gyroX: 0, gyroY: 0, gyroZ: 0, roll: 0, pitch: 0, yaw: 0, rollRaw: 0, pitchRaw: 0,
-  packetCount: 0, battery: 87, charging: true, missionTime: 0,
-  signalStrength: -62, gpsFix: true, connected: true,
+  temperature: 24.6,
+  humidity: 48,
+  pressure: 1008.4,
+  altitude: 41,
+  latitude: 28.6139,
+  longitude: 77.209,
+  accelerationX: 0.002 * ACCEL.gravity,
+  accelerationY: -0.001 * ACCEL.gravity,
+  accelerationZ: ACCEL.gravity,
+  gyroX: 0,
+  gyroY: 0,
+  gyroZ: 0,
+  roll: 0,
+  pitch: 0,
+  yaw: 0,
+  rollRaw: 0,
+  pitchRaw: 0,
+  packetCount: 0,
+  battery: 87,
+  charging: true,
+  missionTime: 0,
+  signalStrength: -62,
+  gpsFix: true,
+  connected: true,
 };
 
 /** Neutral values used before any live packet arrives. Nothing here is real data. */
 export const emptyTelemetry: Telemetry = {
-  temperature: 0, humidity: 0, pressure: 0, altitude: 0,
-  latitude: 0, longitude: 0,
-  accelerationX: 0, accelerationY: 0, accelerationZ: 0,
-  gyroX: 0, gyroY: 0, gyroZ: 0, roll: 0, pitch: 0, yaw: 0, rollRaw: 0, pitchRaw: 0,
-  packetCount: 0, battery: 0, charging: false, missionTime: 0,
-  signalStrength: 0, gpsFix: false, connected: false,
+  temperature: 0,
+  humidity: 0,
+  pressure: 0,
+  altitude: 0,
+  latitude: 0,
+  longitude: 0,
+  accelerationX: 0,
+  accelerationY: 0,
+  accelerationZ: 0,
+  gyroX: 0,
+  gyroY: 0,
+  gyroZ: 0,
+  roll: 0,
+  pitch: 0,
+  yaw: 0,
+  rollRaw: 0,
+  pitchRaw: 0,
+  packetCount: 0,
+  battery: 0,
+  charging: false,
+  missionTime: 0,
+  signalStrength: 0,
+  gpsFix: false,
+  connected: false,
 };
 
 export const ALL_TELEMETRY_FIELDS = Object.keys(initialTelemetry) as TelemetryField[];
@@ -73,8 +109,12 @@ export interface HistoryPoint {
   temperature: number;
   pressure: number;
   humidity: number;
-  ax: number; ay: number; az: number;
-  gx: number; gy: number; gz: number;
+  ax: number;
+  ay: number;
+  az: number;
+  gx: number;
+  gy: number;
+  gz: number;
   /** Normalised attitude. */
   roll: number;
   pitch: number;
@@ -85,7 +125,14 @@ export interface HistoryPoint {
 
 export interface TelemetryEvent {
   at: number;
-  type: "connected" | "disconnected" | "reconnecting" | "stale" | "error" | "receiver-restart" | "packet-gap";
+  type:
+    | "connected"
+    | "disconnected"
+    | "reconnecting"
+    | "stale"
+    | "error"
+    | "receiver-restart"
+    | "packet-gap";
   detail: string;
 }
 

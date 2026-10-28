@@ -14,19 +14,40 @@ export function MissionCountdown({ target }: { target: Date | null }) {
 
   const parts =
     c.state === "before"
-      ? [["Days", pad(c.days)], ["Hours", pad(c.hours)], ["Min", pad(c.minutes)], ["Sec", pad(c.seconds)]]
-      : [["Days", "--"], ["Hours", "--"], ["Min", "--"], ["Sec", "--"]];
+      ? [
+          ["Days", pad(c.days)],
+          ["Hours", pad(c.hours)],
+          ["Min", pad(c.minutes)],
+          ["Sec", pad(c.seconds)],
+        ]
+      : [
+          ["Days", "--"],
+          ["Hours", "--"],
+          ["Min", "--"],
+          ["Sec", "--"],
+        ];
 
   const caption =
-    c.state === "unscheduled" ? "Awaiting mission schedule" : c.state === "before" ? "Until mission start" : `Mission underway · ${fmtTime(c.elapsedSeconds)}`;
-  const label = c.state === "before" ? `Countdown: ${c.days} days, ${c.hours} hours, ${c.minutes} minutes, ${c.seconds} seconds` : `Countdown: ${caption}`;
+    c.state === "unscheduled"
+      ? "Awaiting mission schedule"
+      : c.state === "before"
+        ? "Until mission start"
+        : `Mission underway · ${fmtTime(c.elapsedSeconds)}`;
+  const label =
+    c.state === "before"
+      ? `Countdown: ${c.days} days, ${c.hours} hours, ${c.minutes} minutes, ${c.seconds} seconds`
+      : `Countdown: ${caption}`;
 
   return (
     <div role="timer" aria-label={label} className="space-y-3">
       <div className="grid grid-cols-4 gap-2 text-center" aria-hidden="true">
         {parts.map(([name, value]) => (
           <div key={name} className="surface-inset px-1 py-2">
-            <div className={`num text-metric-sm font-semibold ${c.state === "before" ? "text-foreground" : "text-muted-foreground"}`}>{value}</div>
+            <div
+              className={`num text-metric-sm font-semibold ${c.state === "before" ? "text-foreground" : "text-muted-foreground"}`}
+            >
+              {value}
+            </div>
             <div className="eyebrow">{name}</div>
           </div>
         ))}

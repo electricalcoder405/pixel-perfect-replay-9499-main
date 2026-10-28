@@ -47,6 +47,13 @@ describe("PacketTracker", () => {
     t.observe(1);
     t.observe(9);
     t.reset();
-    expect(t.stats).toEqual({ received: 0, duplicates: 0, missed: 0, restarts: 0, lastPacketNo: null, lossPercent: 0 });
+    expect(t.stats).toEqual({
+      received: 0,
+      duplicates: 0,
+      missed: 0,
+      restarts: 0,
+      lastPacketNo: null,
+      lossPercent: 0,
+    });
   });
 });
