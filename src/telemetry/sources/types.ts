@@ -39,6 +39,8 @@ export type PacketParseResult =
       readonly packetNo: number | null;
       /** Packet timestamp in ms when the packet carries one. */
       readonly timestamp: number | null;
+      /** True for keep-alive messages: proves the link is alive but carries no telemetry. */
+      readonly heartbeat?: boolean;
     }
   | { readonly ok: false; readonly reason: string };
 

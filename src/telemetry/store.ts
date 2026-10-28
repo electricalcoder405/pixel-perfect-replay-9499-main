@@ -1,6 +1,9 @@
+import { AlertManager } from "./alerts";
 import { normalizeAngle } from "./attitude";
 import type { ConnectionState, ConnectionStatus } from "./connection";
 import { hasValidGpsFix } from "./gps";
+import { recordsToCsv, recordsToJson, type TelemetryRecord } from "./history";
+import { deriveMissionState } from "./missionState";
 import {
   emptyTelemetry,
   type HistoryPoint,
@@ -11,6 +14,7 @@ import {
   type TelemetrySnapshot,
 } from "./model";
 import { PacketTracker } from "./packetTracker";
+import { evaluateSensors, sensorSignature, type SensorState } from "./sensorManager";
 import type { TelemetrySample, TelemetrySink, TelemetrySource } from "./sources/types";
 
 export interface TelemetryStoreOptions {
@@ -22,9 +26,12 @@ export interface TelemetryStoreOptions {
   now?: () => number;
 }
 
+type SnapshotBase = Omit<TelemetrySnapshot, "diagnostics" | "sensors" | "mission" | "alerts">;
+
 const MAX_EVENTS = 100;
 const MAX_ERRORS = 100;
 const RATE_WINDOW = 10;
+const TICK_MS = 1000;
 
 /**
  * Single source of truth for telemetry.
@@ -47,6 +54,13 @@ export class TelemetryStore {
   private source: TelemetrySource | null = null;
   private key: string | null = null;
   private running = false;
+  private records: TelemetryRecord[] = [];
+  private readonly alertManager = new AlertManager();
+  private sensorCache: readonly SensorState[] = [];
+  private sensorCacheKey = "";
+  private missionStart: number | null = null;
+  private accepted = 0;
+  private ticker: ReturnType<typeof setInterval> | null = null;
 
   private readonly historyCapacity: number;
   private readonly historyView: number;
@@ -91,6 +105,19 @@ export class TelemetryStore {
     return this.buffer;
   }
 
+  /** Every accepted packet still in the buffer (full telemetry), for export and replay. */
+  getRecords(): readonly TelemetryRecord[] {
+    return this.records;
+  }
+
+  exportCsv(): string {
+    return recordsToCsv(this.records);
+  }
+
+  exportJson(): string {
+    return recordsToJson(this.records);
+  }
+
   // ── Source control ──────────────────────────────────────────────────────────
 
   /**
@@ -107,6 +134,12 @@ export class TelemetryStore {
     this.invalid = 0;
     this.events = [];
     this.validationErrors = [];
+    this.records = [];
+    this.alertManager.reset();
+    this.sensorCache = [];
+    this.sensorCacheKey = "";
+    this.missionStart = null;
+    this.accepted = 0;
 
     const initial = source.getInitialSample();
     const fields = initial?.fields ?? {};
@@ -127,11 +160,16 @@ export class TelemetryStore {
     if (this.running || !this.source) return;
     this.running = true;
     this.source.start(this.createSink(this.source));
+    this.ticker = setInterval(() => this.tick(), TICK_MS);
   }
 
   stop(): void {
     if (!this.running || !this.source) return;
     this.running = false;
+    if (this.ticker !== null) {
+      clearInterval(this.ticker);
+      this.ticker = null;
+    }
     this.source.stop();
     this.setConnectionState("idle");
   }
@@ -160,7 +198,7 @@ export class TelemetryStore {
     const at = this.now();
     const connection: ConnectionStatus = { state, detail: detail ?? null, since: prev.state === state ? prev.since : at };
 
-    const type = eventTypeFor(state, detail);
+    const type = eventTypeFor(state);
     if (type && prev.state !== state) this.pushEvent({ at, type, detail: detail ?? "" });
 
     this.snapshot = this.buildSnapshot({ ...this.snapshot, connection });
@@ -170,7 +208,24 @@ export class TelemetryStore {
   private handleInvalid(reason: string): void {
     this.invalid += 1;
     this.validationErrors = [`[${new Date(this.now()).toISOString()}] ${reason}`, ...this.validationErrors].slice(0, MAX_ERRORS);
+    this.alertManager.raise(
+      { kind: "invalid-packet", key: "invalid-packet", level: "warning", message: `${this.invalid} invalid packet${this.invalid === 1 ? "" : "s"} rejected: ${reason}` },
+      this.now(),
+    );
     this.snapshot = this.buildSnapshot({ ...this.snapshot });
+    this.emit();
+  }
+
+  /** Re-evaluates time-dependent state (sensor timeouts, mission duration) between packets. */
+  private tick(): void {
+    const next = this.buildSnapshot({ ...this.snapshot });
+    const prev = this.snapshot;
+    const changed =
+      next.sensors !== prev.sensors ||
+      next.alerts !== prev.alerts ||
+      next.mission.status !== prev.mission.status;
+    if (!changed) return;
+    this.snapshot = next;
     this.emit();
   }
 
@@ -192,6 +247,12 @@ export class TelemetryStore {
 
     this.trackPacket(sample.packetNo, sample.receivedAt);
     this.arrivals = [...this.arrivals, now].slice(-RATE_WINDOW);
+
+    this.accepted += 1;
+    if (this.missionStart === null) this.missionStart = sample.receivedAt;
+    this.alertManager.resolve("invalid-packet", now);
+    this.records.push({ receivedAt: sample.receivedAt, packetNo: sample.packetNo, data });
+    if (this.records.length > this.historyCapacity) this.records.splice(0, this.records.length - this.historyCapacity);
 
     this.buffer.push(toHistoryPoint(data, sample.receivedAt));
     if (this.buffer.length > this.historyCapacity) this.buffer.splice(0, this.buffer.length - this.historyCapacity);
@@ -248,7 +309,8 @@ export class TelemetryStore {
     return span > 0 ? (a.length - 1) / span : 0;
   }
 
-  private buildSnapshot(base: Omit<TelemetrySnapshot, "diagnostics">): TelemetrySnapshot {
+  private buildSnapshot(base: SnapshotBase): TelemetrySnapshot {
+    const now = this.now();
     const diagnostics: TelemetryDiagnostics = {
       ...this.tracker.stats,
       invalid: this.invalid,
@@ -257,7 +319,53 @@ export class TelemetryStore {
       events: this.events,
       validationErrors: this.validationErrors,
     };
-    return { ...base, diagnostics };
+
+    // Sensor health. Keep the previous array when nothing changed so subscribers stay quiet.
+    const evaluated = evaluateSensors(base.available, base.updatedAt, base.data.gpsFix, now);
+    const signature = sensorSignature(evaluated);
+    if (signature !== this.sensorCacheKey) {
+      this.sensorCache = evaluated;
+      this.sensorCacheKey = signature;
+    }
+
+    this.syncAlerts(this.sensorCache, base.connection, now);
+    const mission = deriveMissionState({
+      startTime: this.missionStart,
+      packetCount: this.accepted,
+      lastPacketTime: base.lastUpdated,
+      connection: base.connection,
+      now,
+    });
+    return { ...base, diagnostics, sensors: this.sensorCache, mission, alerts: this.alertManager.list };
+  }
+
+  /** Raises or resolves alerts from the current sensor and connection state. */
+  private syncAlerts(sensors: readonly SensorState[], connection: ConnectionStatus, now: number): void {
+    const alerts = this.alertManager;
+    for (const sensor of sensors) {
+      const key = `sensor:${sensor.id}`;
+      if (sensor.health === "offline") {
+        alerts.raise({ kind: "sensor-disconnected", key, level: "warning", message: `${sensor.label} stopped reporting` }, now);
+      } else {
+        alerts.resolve(key, now);
+      }
+      if (sensor.id === "gps") {
+        if (sensor.health === "degraded") alerts.raise({ kind: "gps-lost", key: "gps-lost", level: "warning", message: "GPS has no position fix" }, now);
+        else alerts.resolve("gps-lost", now);
+      }
+    }
+
+    if (connection.state === "disconnected" || connection.state === "error") {
+      alerts.raise({ kind: "connection-lost", key: "connection-lost", level: "critical", message: connection.detail ? `Telemetry link lost (${connection.detail})` : "Telemetry link lost" }, now);
+    } else if (connection.state === "connected") {
+      alerts.resolve("connection-lost", now);
+    }
+
+    if (connection.state === "stale") {
+      alerts.raise({ kind: "packet-timeout", key: "packet-timeout", level: "warning", message: connection.detail ?? "No packets received recently" }, now);
+    } else if (connection.state === "connected") {
+      alerts.resolve("packet-timeout", now);
+    }
   }
 
   private emit(): void {
@@ -265,13 +373,14 @@ export class TelemetryStore {
   }
 }
 
-function eventTypeFor(state: ConnectionState, detail: string | undefined): TelemetryEvent["type"] | null {
+function eventTypeFor(state: ConnectionState): TelemetryEvent["type"] | null {
   switch (state) {
     case "connected": return "connected";
     case "stale": return "stale";
     case "disconnected": return "disconnected";
     case "error": return "error";
-    case "connecting": return detail ? "reconnecting" : null;
+    case "reconnecting": return "reconnecting";
+    case "connecting": return null;
     case "idle": return null;
   }
 }

@@ -1,6 +1,7 @@
-import { useContext, useSyncExternalStore } from "react";
+import { useContext, useMemo, useSyncExternalStore } from "react";
 import type { ConnectionStatus } from "./connection";
 import { TelemetryContext } from "./context";
+import { downloadText, HistoryReplay } from "./history";
 import type { TelemetryField, TelemetrySnapshot } from "./model";
 import type { TelemetryStore } from "./store";
 
@@ -37,4 +38,32 @@ export function useConnection(): ConnectionStatus {
 /** True once the active source has provided a real value for the field. */
 export function useFieldAvailable(field: TelemetryField): boolean {
   return useTelemetrySelector((s) => s.available.has(field));
+}
+
+export function useSensors(): TelemetrySnapshot["sensors"] {
+  return useTelemetrySelector((s) => s.sensors);
+}
+
+export function useMissionState(): TelemetrySnapshot["mission"] {
+  return useTelemetrySelector((s) => s.mission);
+}
+
+export function useAlerts(): TelemetrySnapshot["alerts"] {
+  return useTelemetrySelector((s) => s.alerts);
+}
+
+/** Export and replay access to stored packets. Reads the store on demand (not reactive). */
+export function useHistoryService() {
+  const store = useTelemetryStore();
+  return useMemo(
+    () => ({
+      records: () => store.getRecords(),
+      exportCsv: () => store.exportCsv(),
+      exportJson: () => store.exportJson(),
+      downloadCsv: (name = "orbitra-telemetry.csv") => downloadText(name, store.exportCsv(), "text/csv"),
+      downloadJson: (name = "orbitra-telemetry.json") => downloadText(name, store.exportJson(), "application/json"),
+      createReplay: () => new HistoryReplay(store.getRecords().slice()),
+    }),
+    [store],
+  );
 }

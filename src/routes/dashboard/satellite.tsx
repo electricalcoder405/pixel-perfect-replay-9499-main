@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { pageTitle } from "@/app/mission";
-import { ModulePage } from "@/components/shell/ModulePage";
+import { SatellitePage } from "@/components/satellite/SatellitePage";
 
 export const Route = createFileRoute("/dashboard/satellite")({
   head: () => ({ meta: [{ title: pageTitle("Satellite") }] }),
-  component: () => <ModulePage section="satellite" />,
+  component: SatellitePage,
 });

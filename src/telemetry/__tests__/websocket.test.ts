@@ -76,7 +76,7 @@ describe("WebSocketSource", () => {
     const { sockets, store } = setup({ backoffBaseMs: 10 });
     sockets[0]?.open();
     sockets[0]?.drop(1006);
-    expect(store.getSnapshot().connection.state).toBe("connecting");
+    expect(store.getSnapshot().connection.state).toBe("reconnecting");
     expect(store.getSnapshot().diagnostics.events.some((e) => e.type === "disconnected")).toBe(true);
     await wait(40);
     expect(sockets.length).toBe(2);

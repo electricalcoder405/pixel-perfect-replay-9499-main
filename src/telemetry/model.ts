@@ -1,4 +1,7 @@
+import type { Alert } from "./alerts";
 import type { ConnectionStatus } from "./connection";
+import type { MissionState } from "./missionState";
+import type { SensorState } from "./sensorManager";
 import type { PacketStats } from "./packetTracker";
 import { ACCEL } from "./units";
 
@@ -117,4 +120,10 @@ export interface TelemetrySnapshot {
   readonly source: TelemetrySourceInfo;
   /** Wall-clock ms of the last accepted packet, or null. */
   readonly lastUpdated: number | null;
+  /** Per-sensor availability, last update, health and errors. */
+  readonly sensors: readonly SensorState[];
+  /** Mission start, duration, status, packet count and last packet time. */
+  readonly mission: MissionState;
+  /** Newest first, including resolved alerts. */
+  readonly alerts: readonly Alert[];
 }

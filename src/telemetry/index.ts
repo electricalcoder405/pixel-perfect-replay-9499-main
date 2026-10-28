@@ -1,9 +1,22 @@
+export { AlertManager } from "./alerts";
+export type { Alert, AlertInput, AlertKind, AlertLevel } from "./alerts";
 export { normalizeAngle, normalizeHeading } from "./attitude";
 export { CONNECTION_META } from "./connection";
 export type { ConnectionMeta, ConnectionState, ConnectionStatus, ConnectionTone } from "./connection";
-export { telemetryConfig } from "./config";
+export { DEFAULT_WS_URL, getTelemetryMode, resolveTelemetryConfig, setTelemetryMode, telemetryConfig } from "./config";
+export type { TelemetryMode } from "./config";
 export { fmtTime, formatValue, NO_DATA } from "./format";
 export { hasValidGpsFix } from "./gps";
+export { downloadText, HistoryReplay, recordsToCsv, recordsToJson } from "./history";
+export type { TelemetryRecord } from "./history";
+export { deriveMissionState } from "./missionState";
+export type { MissionState, MissionStatus } from "./missionState";
+export { parseBridgePacket } from "./parser";
+export { evaluateSensors, SENSOR_TIMEOUT_MS } from "./sensorManager";
+export type { SensorHealth, SensorState } from "./sensorManager";
+export {
+  useAlerts, useHistoryService, useMissionState, useSensors,
+} from "./hooks";
 export { useConnection, useFieldAvailable, useTelemetrySelector, useTelemetrySnapshot, useTelemetryStore } from "./hooks";
 export { ALL_TELEMETRY_FIELDS, emptyTelemetry, initialTelemetry } from "./model";
 export type {

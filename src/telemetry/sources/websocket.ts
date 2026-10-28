@@ -9,6 +9,7 @@ export interface WebSocketLike {
   onerror: ((event: unknown) => void) | null;
   onclose: ((event: { code: number; reason: string }) => void) | null;
   close(): void;
+  send?(data: string): void;
 }
 
 export interface WebSocketSourceOptions {
@@ -24,6 +25,12 @@ export interface WebSocketSourceOptions {
   backoffMultiplier?: number;
   /** Longest reconnect delay. Default 30 000 ms. */
   backoffMaxMs?: number;
+  /** Send a keep-alive this often while connected. Default 0 (disabled): the bridge protocol decides. */
+  heartbeatIntervalMs?: number;
+  /** Keep-alive message text. Default {"type":"ping"}. */
+  heartbeatMessage?: string;
+  /** Force a reconnect after this long in the stale state. Default 3 x staleTimeoutMs. */
+  recoverAfterMs?: number;
   /** Socket factory, injectable for tests. Defaults to `new WebSocket(url)`. */
   createSocket?: (url: string) => WebSocketLike;
 }
@@ -47,17 +54,21 @@ export class WebSocketSource implements TelemetrySource {
   private state: ConnectionState = "idle";
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private staleTimer: ReturnType<typeof setTimeout> | null = null;
+  private recoverTimer: ReturnType<typeof setTimeout> | null = null;
+  private heartbeatTimer: ReturnType<typeof setInterval> | null = null;
 
   private readonly staleTimeoutMs: number;
   private readonly backoffBaseMs: number;
   private readonly backoffMultiplier: number;
   private readonly backoffMaxMs: number;
+  private readonly recoverAfterMs: number;
 
   constructor(private readonly options: WebSocketSourceOptions) {
     this.staleTimeoutMs = options.staleTimeoutMs ?? 10_000;
     this.backoffBaseMs = options.backoffBaseMs ?? 1_000;
     this.backoffMultiplier = options.backoffMultiplier ?? 1.5;
     this.backoffMaxMs = options.backoffMaxMs ?? 30_000;
+    this.recoverAfterMs = options.recoverAfterMs ?? this.staleTimeoutMs * 3;
   }
 
   /** No real data exists until the first packet arrives. */
@@ -76,21 +87,29 @@ export class WebSocketSource implements TelemetrySource {
   stop(): void {
     this.running = false;
     this.clearTimers();
+    this.closeSocket();
+    this.sink = null;
+  }
+
+  /** Detaches handlers and closes the current socket, if any. */
+  private closeSocket(): void {
     const socket = this.socket;
     this.socket = null;
-    if (socket) {
-      socket.onmessage = null;
-      socket.onerror = null;
-      socket.onclose = null;
-      if (socket.readyState === CONNECTING) {
-        // Closing a connecting socket throws a console error, so close once it opens.
-        socket.onopen = () => socket.close();
-      } else {
-        socket.onopen = null;
+    if (!socket) return;
+    socket.onmessage = null;
+    socket.onerror = null;
+    socket.onclose = null;
+    if (socket.readyState === CONNECTING) {
+      // Closing a connecting socket throws a console error, so close once it opens.
+      socket.onopen = () => socket.close();
+    } else {
+      socket.onopen = null;
+      try {
         socket.close();
+      } catch {
+        // Already closed.
       }
     }
-    this.sink = null;
   }
 
   private setState(state: ConnectionState, detail?: string): void {
@@ -116,6 +135,7 @@ export class WebSocketSource implements TelemetrySource {
       this.attempts = 0;
       this.setState("connected");
       this.armStaleTimer();
+      this.startHeartbeat(socket);
     };
 
     socket.onmessage = (event) => {
@@ -127,6 +147,7 @@ export class WebSocketSource implements TelemetrySource {
 
     socket.onclose = (event) => {
       this.clearStaleTimer();
+      this.stopHeartbeat();
       this.setState("disconnected", `Code ${event.code}${event.reason ? `: ${event.reason}` : ""}`);
       this.scheduleReconnect();
     };
@@ -139,6 +160,7 @@ export class WebSocketSource implements TelemetrySource {
     }
     // Any message proves the link is alive, so recover from a stale state.
     if (this.state === "stale") this.setState("connected");
+    this.clearRecoverTimer();
     this.armStaleTimer();
 
     const result = this.options.parse(data);
@@ -146,6 +168,7 @@ export class WebSocketSource implements TelemetrySource {
       this.sink?.reportInvalid(result.reason);
       return;
     }
+    if (result.heartbeat) return;
     this.sink?.publish({
       fields: result.fields,
       packetNo: result.packetNo,
@@ -156,8 +179,43 @@ export class WebSocketSource implements TelemetrySource {
   private armStaleTimer(): void {
     this.clearStaleTimer();
     this.staleTimer = setTimeout(() => {
-      if (this.state === "connected") this.setState("stale", `No packets for ${Math.round(this.staleTimeoutMs / 1000)} seconds`);
+      if (this.state !== "connected") return;
+      this.setState("stale", `No packets for ${Math.round(this.staleTimeoutMs / 1000)} seconds`);
+      this.armRecoverTimer();
     }, this.staleTimeoutMs);
+  }
+
+  /** A link that stays silent after going stale is probably dead: drop it and reconnect. */
+  private armRecoverTimer(): void {
+    this.clearRecoverTimer();
+    this.recoverTimer = setTimeout(() => {
+      if (!this.running || this.state !== "stale") return;
+      this.stopHeartbeat();
+      this.closeSocket();
+      this.setState("disconnected", "No data received; recovering the link");
+      this.scheduleReconnect();
+    }, this.recoverAfterMs);
+  }
+
+  private startHeartbeat(socket: WebSocketLike): void {
+    this.stopHeartbeat();
+    const interval = this.options.heartbeatIntervalMs ?? 0;
+    if (interval <= 0 || !socket.send) return;
+    const message = this.options.heartbeatMessage ?? '{"type":"ping"}';
+    this.heartbeatTimer = setInterval(() => {
+      try {
+        if (this.socket === socket) socket.send?.(message);
+      } catch {
+        // A failed send surfaces as a close event, which triggers reconnection.
+      }
+    }, interval);
+  }
+
+  private stopHeartbeat(): void {
+    if (this.heartbeatTimer !== null) {
+      clearInterval(this.heartbeatTimer);
+      this.heartbeatTimer = null;
+    }
   }
 
   private scheduleReconnect(): void {
@@ -165,7 +223,7 @@ export class WebSocketSource implements TelemetrySource {
     this.clearReconnectTimer();
     const delay = Math.min(this.backoffBaseMs * Math.pow(this.backoffMultiplier, this.attempts), this.backoffMaxMs);
     this.attempts += 1;
-    this.setState("connecting", `Reconnecting in ${Math.round(delay / 100) / 10} s (attempt ${this.attempts})`);
+    this.setState("reconnecting", `Reconnecting in ${Math.round(delay / 100) / 10} s (attempt ${this.attempts})`);
     this.reconnectTimer = setTimeout(() => this.connect(), delay);
   }
 
@@ -173,6 +231,13 @@ export class WebSocketSource implements TelemetrySource {
     if (this.staleTimer !== null) {
       clearTimeout(this.staleTimer);
       this.staleTimer = null;
+    }
+  }
+
+  private clearRecoverTimer(): void {
+    if (this.recoverTimer !== null) {
+      clearTimeout(this.recoverTimer);
+      this.recoverTimer = null;
     }
   }
 
@@ -185,6 +250,8 @@ export class WebSocketSource implements TelemetrySource {
 
   private clearTimers(): void {
     this.clearStaleTimer();
+    this.clearRecoverTimer();
+    this.stopHeartbeat();
     this.clearReconnectTimer();
   }
 }

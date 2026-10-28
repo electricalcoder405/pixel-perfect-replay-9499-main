@@ -8,7 +8,7 @@ import { WebSocketSource } from "./websocket";
  */
 export type TelemetrySourceConfig =
   | ({ kind: "simulator" } & SimulatorOptions)
-  | { kind: "websocket"; url: string; parse: PacketParser; staleTimeoutMs?: number };
+  | { kind: "websocket"; url: string; parse: PacketParser; staleTimeoutMs?: number; heartbeatIntervalMs?: number };
 
 export interface TelemetryConfig {
   source: TelemetrySourceConfig;
@@ -25,6 +25,7 @@ export function createTelemetrySource(config: TelemetrySourceConfig): TelemetryS
         url: config.url,
         parse: config.parse,
         ...(config.staleTimeoutMs !== undefined ? { staleTimeoutMs: config.staleTimeoutMs } : {}),
+        ...(config.heartbeatIntervalMs !== undefined ? { heartbeatIntervalMs: config.heartbeatIntervalMs } : {}),
       });
   }
 }
