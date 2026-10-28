@@ -170,6 +170,15 @@
   border-radius: var(--radius-md);
 }
 
+/* Page width and gutters shared by the landing page and the dashboard shell */
+@utility page-container {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 100rem;
+  padding-inline: 1rem;
+  @media (min-width: 768px) { padding-inline: 1.5rem; }
+}
+
 /* Text */
 @utility glow-amber { text-shadow: 0 0 18px color-mix(in oklab, var(--amber) 55%, transparent); }
 @utility glow-copper { text-shadow: 0 0 18px color-mix(in oklab, var(--copper) 60%, transparent); }
@@ -195,6 +204,11 @@
   background: currentColor; box-shadow: 0 0 10px currentColor;
   animation: pulse-led 1.6s ease-in-out infinite;
 }
+@utility ping-ring {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: ping-ring 2.4s ease-out infinite;
+}
 @utility scanline {
   background-image: repeating-linear-gradient(0deg, oklch(1 0 0 / 2%) 0 1px, transparent 1px 3px);
 }
@@ -203,6 +217,10 @@
 @keyframes spin-slow { to { transform: rotate(360deg); } }
 @keyframes earth-scroll { to { background-position: -200% 0; } }
 @keyframes shimmer { to { background-position: -200% 0; } }
+@keyframes ping-ring {
+  from { transform: scale(1); opacity: 0.7; }
+  to { transform: scale(4.5); opacity: 0; }
+}
 
 /* Users who ask for less motion get none of the looping decoration. */
 @media (prefers-reduced-motion: reduce) {
