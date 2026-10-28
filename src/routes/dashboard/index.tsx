@@ -1,78 +1,48 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { AnimatePresence, motion } from "framer-motion";
-import { useCallback, useEffect, useState } from "react";
+import { lazy, Suspense } from "react";
 import { Activity, Compass, Cpu, Droplets, Gauge, RotateCw, Mountain, Navigation, Radio, Signal, Thermometer, Timer, Wifi, Hash, Move3d, LineChart as ChartIcon, Globe, Battery as BatteryIcon, ShieldCheck, Terminal } from "lucide-react";
-import { Starfield } from "@/components/mission/Starfield";
-import { Loader } from "@/components/mission/Loader";
-import { CubeSat } from "@/components/mission/CubeSat";
+import { PageHeader } from "@/components/ds";
+import { Skeleton } from "@/components/ui/skeleton";
+import { findNavItem } from "@/app/navigation";
+import { pageTitle } from "@/app/mission";
 import { Battery, Dial, Earth, Horizon, MiniChart, Panel, StatCard, StatusList, TelemetryLog, Vector } from "@/components/mission/Panels";
 import { ACCEL, accelToPercent, fmtTime, useTelemetry } from "@/lib/telemetry";
+import { useTelemetrySelector } from "@/telemetry/hooks";
 
-export const Route = createFileRoute("/")({
-  ssr: false,
+export const Route = createFileRoute("/dashboard/")({
   head: () => ({
     meta: [
-      { title: "OLD MONK Mission Control · Orbita '26 CubeSat" },
-      { name: "description", content: "Live CubeSat telemetry dashboard for the OLD MONK mission — Orbita '26." },
-      { property: "og:title", content: "OLD MONK Mission Control · Orbita '26" },
-      { property: "og:description", content: "Live CubeSat telemetry: 3D attitude, sensors, GPS and power." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
+      { title: pageTitle("Mission Overview") },
+      { name: "description", content: "Live CubeSat telemetry dashboard for the OLD MONK mission — ORBITRA'26." },
     ],
   }),
-  component: Index,
+  component: Overview,
 });
+
+// three.js is large and only the overview uses it, so it loads on demand.
+const CubeSat = lazy(() => import("@/components/mission/CubeSat").then((m) => ({ default: m.CubeSat })));
 
 const I = "h-4 w-4";
 
-function Index() {
-  const [loading, setLoading] = useState(true);
-  const done = useCallback(() => setLoading(false), []);
-  return (
-    <>
-      <Starfield />
-      <AnimatePresence>{loading && <Loader onDone={done} />}</AnimatePresence>
-      {!loading && <Dashboard />}
-    </>
-  );
-}
-
-function Clock() {
-  const [now, setNow] = useState(new Date());
-  useEffect(() => { const id = setInterval(() => setNow(new Date()), 1000); return () => clearInterval(id); }, []);
-  return <>{now.toLocaleTimeString("en-GB")}</>;
-}
-
-function Dashboard() {
+function Overview() {
   const { data: d, history } = useTelemetry();
   const sig = Math.max(0, Math.min(4, Math.round((d.signalStrength + 90) / 8)));
   const accel = Math.hypot(d.accelerationX, d.accelerationY, d.accelerationZ);
   const angVel = Math.hypot(d.gyroX, d.gyroY, d.gyroZ);
+  const sourceLabel = useTelemetrySelector((s) => s.source.label);
 
   return (
-    <motion.main initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8 }} className="mx-auto max-w-[1600px] space-y-4 p-3 md:p-5">
-      {/* Header */}
-      <header className="glass flex flex-wrap items-center gap-x-8 gap-y-3 px-5 py-3">
-        <div>
-          <h1 className="font-display text-3xl font-bold tracking-[0.25em] text-amber glow-amber">OLD MONK</h1>
-          <p className="font-mono text-[10px] uppercase tracking-[0.35em] text-muted-foreground">Mission Control Dashboard · <span className="text-cyan">Orbita '26</span></p>
-        </div>
-        <div className="ml-auto flex flex-wrap items-center gap-6 font-mono text-xs">
-          <HeaderStat label="UTC Local" value={<Clock />} />
-          <HeaderStat label="Mission" value={fmtTime(d.missionTime)} accent />
-          <HeaderStat label="Signal" value={
-            <span className="flex items-end gap-0.5">{[0, 1, 2, 3].map((b) => <span key={b} className={`w-1.5 rounded-sm ${b < sig ? "bg-cyan shadow-[0_0_6px_var(--cyan)]" : "bg-muted"}`} style={{ height: 6 + b * 4 }} />)}<span className="ml-2">{d.signalStrength} dBm</span></span>} />
-          <HeaderStat label="Link" value={<span className="flex items-center gap-2 text-success"><span className="led" />CONNECTED</span>} />
-          <HeaderStat label="Packets" value={d.packetCount.toLocaleString()} />
-        </div>
-      </header>
+    <div className="space-y-4">
+      <PageHeader eyebrow="Live" title={findNavItem("overview").label} description={findNavItem("overview").description} />
 
       {/* Hero row */}
       <div className="grid gap-4 lg:grid-cols-12">
         <Panel title="Live Attitude · CubeSat 1U" icon={<Cpu className={I} />} className="lg:col-span-6">
           <div className="relative h-[380px] md:h-[440px]">
             <div className="absolute inset-0 rounded-full bg-cyan/10 blur-3xl" />
-            <CubeSat roll={d.roll} pitch={d.pitch} yaw={d.yaw} />
+            <Suspense fallback={<Skeleton className="absolute inset-4 rounded-xl" role="status" aria-label="Loading 3D view" />}>
+              <CubeSat roll={d.roll} pitch={d.pitch} yaw={d.yaw} />
+            </Suspense>
             <div className="pointer-events-none absolute bottom-2 left-2 right-2 flex justify-between font-mono text-xs">
               {[["ROLL", d.roll], ["PITCH", d.pitch], ["YAW", d.yaw]].map(([k, v]) => (
                 <div key={k as string} className="glass px-3 py-1.5"><span className="text-muted-foreground">{k} </span><span className="tabular-nums text-cyan">{(v as number).toFixed(1)}°</span></div>
@@ -141,16 +111,7 @@ function Dashboard() {
         <Panel title="Angular Velocity" icon={<Radio className={I} />}><MiniChart data={history} keys={["gx", "gy", "gz"]} colors={["var(--amber)", "var(--cyan)", "var(--success)"]} /></Panel>
       </div>
 
-      <footer className="pb-2 text-center font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground">Old Monk · Orbita '26 · Simulated telemetry — awaiting ESP32 uplink</footer>
-    </motion.main>
-  );
-}
-
-function HeaderStat({ label, value, accent }: { label: string; value: React.ReactNode; accent?: boolean }) {
-  return (
-    <div>
-      <div className="text-[9px] uppercase tracking-[0.3em] text-muted-foreground">{label}</div>
-      <div className={`mt-0.5 tabular-nums ${accent ? "text-amber" : "text-foreground"}`}>{value}</div>
+      <p className="pb-2 text-center eyebrow">Old Monk · ORBITRA'26 · Source: {sourceLabel}</p>
     </div>
   );
 }

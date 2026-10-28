@@ -9,34 +9,142 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
+import { Route as DashboardAnalyticsRouteImport } from './routes/dashboard/analytics'
+import { Route as DashboardDiagnosticsRouteImport } from './routes/dashboard/diagnostics'
+import { Route as DashboardGpsRouteImport } from './routes/dashboard/gps'
+import { Route as DashboardGroundStationRouteImport } from './routes/dashboard/ground-station'
+import { Route as DashboardHistoryRouteImport } from './routes/dashboard/history'
+import { Route as DashboardLogsRouteImport } from './routes/dashboard/logs'
+import { Route as DashboardSatelliteRouteImport } from './routes/dashboard/satellite'
+import { Route as DashboardSensorsRouteImport } from './routes/dashboard/sensors'
+import { Route as DashboardSettingsRouteImport } from './routes/dashboard/settings'
+import { Route as DashboardTelemetryRouteImport } from './routes/dashboard/telemetry'
 
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardIndexRoute = DashboardIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardAnalyticsRoute = DashboardAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardDiagnosticsRoute = DashboardDiagnosticsRouteImport.update({
+  id: '/diagnostics',
+  path: '/diagnostics',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardGpsRoute = DashboardGpsRouteImport.update({
+  id: '/gps',
+  path: '/gps',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardGroundStationRoute = DashboardGroundStationRouteImport.update({
+  id: '/ground-station',
+  path: '/ground-station',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardHistoryRoute = DashboardHistoryRouteImport.update({
+  id: '/history',
+  path: '/history',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardLogsRoute = DashboardLogsRouteImport.update({
+  id: '/logs',
+  path: '/logs',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardSatelliteRoute = DashboardSatelliteRouteImport.update({
+  id: '/satellite',
+  path: '/satellite',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardSensorsRoute = DashboardSensorsRouteImport.update({
+  id: '/sensors',
+  path: '/sensors',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardSettingsRoute = DashboardSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardTelemetryRoute = DashboardTelemetryRouteImport.update({
+  id: '/telemetry',
+  path: '/telemetry',
+  getParentRoute: () => DashboardRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRouteWithChildren
+  '/dashboard/': typeof DashboardIndexRoute
+  '/dashboard/analytics': typeof DashboardAnalyticsRoute
+  '/dashboard/diagnostics': typeof DashboardDiagnosticsRoute
+  '/dashboard/gps': typeof DashboardGpsRoute
+  '/dashboard/ground-station': typeof DashboardGroundStationRoute
+  '/dashboard/history': typeof DashboardHistoryRoute
+  '/dashboard/logs': typeof DashboardLogsRoute
+  '/dashboard/satellite': typeof DashboardSatelliteRoute
+  '/dashboard/sensors': typeof DashboardSensorsRoute
+  '/dashboard/settings': typeof DashboardSettingsRoute
+  '/dashboard/telemetry': typeof DashboardTelemetryRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardIndexRoute
+  '/dashboard/analytics': typeof DashboardAnalyticsRoute
+  '/dashboard/diagnostics': typeof DashboardDiagnosticsRoute
+  '/dashboard/gps': typeof DashboardGpsRoute
+  '/dashboard/ground-station': typeof DashboardGroundStationRoute
+  '/dashboard/history': typeof DashboardHistoryRoute
+  '/dashboard/logs': typeof DashboardLogsRoute
+  '/dashboard/satellite': typeof DashboardSatelliteRoute
+  '/dashboard/sensors': typeof DashboardSensorsRoute
+  '/dashboard/settings': typeof DashboardSettingsRoute
+  '/dashboard/telemetry': typeof DashboardTelemetryRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRouteWithChildren
+  '/dashboard/': typeof DashboardIndexRoute
+  '/dashboard/analytics': typeof DashboardAnalyticsRoute
+  '/dashboard/diagnostics': typeof DashboardDiagnosticsRoute
+  '/dashboard/gps': typeof DashboardGpsRoute
+  '/dashboard/ground-station': typeof DashboardGroundStationRoute
+  '/dashboard/history': typeof DashboardHistoryRoute
+  '/dashboard/logs': typeof DashboardLogsRoute
+  '/dashboard/satellite': typeof DashboardSatelliteRoute
+  '/dashboard/sensors': typeof DashboardSensorsRoute
+  '/dashboard/settings': typeof DashboardSettingsRoute
+  '/dashboard/telemetry': typeof DashboardTelemetryRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/dashboard' | '/dashboard/' | '/dashboard/analytics' | '/dashboard/diagnostics' | '/dashboard/gps' | '/dashboard/ground-station' | '/dashboard/history' | '/dashboard/logs' | '/dashboard/satellite' | '/dashboard/sensors' | '/dashboard/settings' | '/dashboard/telemetry'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/dashboard' | '/dashboard/analytics' | '/dashboard/diagnostics' | '/dashboard/gps' | '/dashboard/ground-station' | '/dashboard/history' | '/dashboard/logs' | '/dashboard/satellite' | '/dashboard/sensors' | '/dashboard/settings' | '/dashboard/telemetry'
+  id: '__root__' | '/' | '/dashboard' | '/dashboard/' | '/dashboard/analytics' | '/dashboard/diagnostics' | '/dashboard/gps' | '/dashboard/ground-station' | '/dashboard/history' | '/dashboard/logs' | '/dashboard/satellite' | '/dashboard/sensors' | '/dashboard/settings' | '/dashboard/telemetry'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DashboardRoute: typeof DashboardRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +156,128 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/': {
+      id: '/dashboard/'
+      path: '/'
+      fullPath: '/dashboard/'
+      preLoaderRoute: typeof DashboardIndexRouteImport
+      parentRoute: typeof DashboardRouteImport
+    }
+    '/dashboard/analytics': {
+      id: '/dashboard/analytics'
+      path: '/analytics'
+      fullPath: '/dashboard/analytics'
+      preLoaderRoute: typeof DashboardAnalyticsRouteImport
+      parentRoute: typeof DashboardRouteImport
+    }
+    '/dashboard/diagnostics': {
+      id: '/dashboard/diagnostics'
+      path: '/diagnostics'
+      fullPath: '/dashboard/diagnostics'
+      preLoaderRoute: typeof DashboardDiagnosticsRouteImport
+      parentRoute: typeof DashboardRouteImport
+    }
+    '/dashboard/gps': {
+      id: '/dashboard/gps'
+      path: '/gps'
+      fullPath: '/dashboard/gps'
+      preLoaderRoute: typeof DashboardGpsRouteImport
+      parentRoute: typeof DashboardRouteImport
+    }
+    '/dashboard/ground-station': {
+      id: '/dashboard/ground-station'
+      path: '/ground-station'
+      fullPath: '/dashboard/ground-station'
+      preLoaderRoute: typeof DashboardGroundStationRouteImport
+      parentRoute: typeof DashboardRouteImport
+    }
+    '/dashboard/history': {
+      id: '/dashboard/history'
+      path: '/history'
+      fullPath: '/dashboard/history'
+      preLoaderRoute: typeof DashboardHistoryRouteImport
+      parentRoute: typeof DashboardRouteImport
+    }
+    '/dashboard/logs': {
+      id: '/dashboard/logs'
+      path: '/logs'
+      fullPath: '/dashboard/logs'
+      preLoaderRoute: typeof DashboardLogsRouteImport
+      parentRoute: typeof DashboardRouteImport
+    }
+    '/dashboard/satellite': {
+      id: '/dashboard/satellite'
+      path: '/satellite'
+      fullPath: '/dashboard/satellite'
+      preLoaderRoute: typeof DashboardSatelliteRouteImport
+      parentRoute: typeof DashboardRouteImport
+    }
+    '/dashboard/sensors': {
+      id: '/dashboard/sensors'
+      path: '/sensors'
+      fullPath: '/dashboard/sensors'
+      preLoaderRoute: typeof DashboardSensorsRouteImport
+      parentRoute: typeof DashboardRouteImport
+    }
+    '/dashboard/settings': {
+      id: '/dashboard/settings'
+      path: '/settings'
+      fullPath: '/dashboard/settings'
+      preLoaderRoute: typeof DashboardSettingsRouteImport
+      parentRoute: typeof DashboardRouteImport
+    }
+    '/dashboard/telemetry': {
+      id: '/dashboard/telemetry'
+      path: '/telemetry'
+      fullPath: '/dashboard/telemetry'
+      preLoaderRoute: typeof DashboardTelemetryRouteImport
+      parentRoute: typeof DashboardRouteImport
+    }
   }
 }
 
+interface DashboardRouteChildren {
+  DashboardIndexRoute: typeof DashboardIndexRoute
+  DashboardAnalyticsRoute: typeof DashboardAnalyticsRoute
+  DashboardDiagnosticsRoute: typeof DashboardDiagnosticsRoute
+  DashboardGpsRoute: typeof DashboardGpsRoute
+  DashboardGroundStationRoute: typeof DashboardGroundStationRoute
+  DashboardHistoryRoute: typeof DashboardHistoryRoute
+  DashboardLogsRoute: typeof DashboardLogsRoute
+  DashboardSatelliteRoute: typeof DashboardSatelliteRoute
+  DashboardSensorsRoute: typeof DashboardSensorsRoute
+  DashboardSettingsRoute: typeof DashboardSettingsRoute
+  DashboardTelemetryRoute: typeof DashboardTelemetryRoute
+}
+
+const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardIndexRoute: DashboardIndexRoute,
+  DashboardAnalyticsRoute: DashboardAnalyticsRoute,
+  DashboardDiagnosticsRoute: DashboardDiagnosticsRoute,
+  DashboardGpsRoute: DashboardGpsRoute,
+  DashboardGroundStationRoute: DashboardGroundStationRoute,
+  DashboardHistoryRoute: DashboardHistoryRoute,
+  DashboardLogsRoute: DashboardLogsRoute,
+  DashboardSatelliteRoute: DashboardSatelliteRoute,
+  DashboardSensorsRoute: DashboardSensorsRoute,
+  DashboardSettingsRoute: DashboardSettingsRoute,
+  DashboardTelemetryRoute: DashboardTelemetryRoute,
+}
+
+const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
+  DashboardRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DashboardRoute: DashboardRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

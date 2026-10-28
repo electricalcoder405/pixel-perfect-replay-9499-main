@@ -8,6 +8,7 @@ import {
   Scripts,
   type ErrorComponentProps,
 } from "@tanstack/react-router";
+import { MotionConfig } from "framer-motion";
 import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
@@ -118,9 +119,12 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <TelemetryProvider config={telemetryConfig}>
-        <Outlet />
-      </TelemetryProvider>
+      {/* Users who ask their OS for reduced motion get no movement from framer-motion animations. */}
+      <MotionConfig reducedMotion="user">
+        <TelemetryProvider config={telemetryConfig}>
+          <Outlet />
+        </TelemetryProvider>
+      </MotionConfig>
     </QueryClientProvider>
   );
 }
