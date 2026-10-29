@@ -1,6 +1,6 @@
 /**
  * Design-system constants for use in TypeScript.
- * The colour values themselves live in `styles.css`; this file only names them.
+ * Earth Blue + Space Black Palette.
  */
 
 /** Semantic meaning of a status colour. */
@@ -26,20 +26,20 @@ export const toneSurface: Readonly<Record<Tone, string>> = {
   accent: "bg-amber/10 border-amber/30 text-amber",
 };
 
-/** CSS variable references for chart and SVG colours (Recharts, canvas, three.js). */
+/** CSS variable references & hex fallbacks for chart and SVG colours (Recharts, canvas, three.js). */
 export const chartColors = {
-  amber: "var(--amber)",
-  copper: "var(--copper)",
-  cyan: "var(--cyan)",
-  purple: "var(--purple)",
-  success: "var(--success)",
-  warning: "var(--warning)",
-  critical: "var(--critical)",
+  amber: "#1D7CF2",
+  copper: "#31C8FF",
+  cyan: "#31C8FF",
+  purple: "#818cf8",
+  success: "#22C55E",
+  warning: "#FACC15",
+  critical: "#EF4444",
   muted: "var(--muted-foreground)",
   grid: "var(--border)",
 } as const;
 
-/** Default colour order for multi-series charts. */
+/** Default colour order for multi-series charts in Earth Blue palette. */
 export const seriesPalette = [
   chartColors.amber,
   chartColors.cyan,

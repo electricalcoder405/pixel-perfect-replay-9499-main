@@ -73,7 +73,7 @@ function Sat({
       {[-0.5, 0, 0.5].map((y) => (
         <mesh key={y} position={[0, y, 0]}>
           <boxGeometry args={[1.04, 0.05, 1.04]} />
-          <meshStandardMaterial color="#c97a21" metalness={1} roughness={0.3} />
+          <meshStandardMaterial color="#1D7CF2" metalness={1} roughness={0.3} />
         </mesh>
       ))}
       <mesh position={[0, 0, 0.51]}>
@@ -104,7 +104,7 @@ export function CubeSat({ roll, pitch, yaw }: { roll: number; pitch: number; yaw
       gl={{ alpha: true, antialias: true }}
     >
       <ambientLight intensity={0.35} />
-      <directionalLight position={[4, 5, 3]} intensity={2.2} color="#ffe2b8" />
+      <directionalLight position={[4, 5, 3]} intensity={2.2} color="#d4e8ff" />
       <pointLight position={[-3, -1, 2]} intensity={12} color="#00e5ff" />
       <Environment resolution={64}>
         <Lightformer intensity={2} position={[0, 5, 0]} scale={[10, 10, 1]} />
@@ -117,7 +117,7 @@ export function CubeSat({ roll, pitch, yaw }: { roll: number; pitch: number; yaw
         />
         <Lightformer
           intensity={1.2}
-          color="#c97a21"
+          color="#1D7CF2"
           position={[5, -1, 1]}
           rotation-y={-Math.PI / 2}
           scale={[20, 1, 1]}

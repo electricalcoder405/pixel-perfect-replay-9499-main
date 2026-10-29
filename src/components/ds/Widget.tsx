@@ -36,7 +36,7 @@ export interface WidgetProps {
 
 /**
  * The standard container for every dashboard panel: titled header, consistent padding,
- * and built-in loading, empty and error states, so pages never hand-roll those.
+ * and built-in loading, empty and error states with aerospace styling.
  */
 export function Widget({
   title,
@@ -57,18 +57,18 @@ export function Widget({
       as="section"
       padding="none"
       aria-labelledby={headingId}
-      className={cn("flex min-w-0 flex-col overflow-hidden", spanClass[span], className)}
+      className={cn("flex min-w-0 flex-col overflow-hidden shadow-elevation-1", spanClass[span], className)}
     >
-      <header className="flex items-center gap-2 border-b border-border px-4 py-3">
+      <header className="flex items-center gap-2.5 border-b border-border/70 bg-surface-1/50 px-4 py-2.5">
         {icon && (
-          <span className="text-cyan" aria-hidden="true">
+          <span className="flex items-center text-cyan shrink-0" aria-hidden="true">
             {icon}
           </span>
         )}
-        <h2 id={headingId} className="eyebrow text-foreground!">
+        <h2 id={headingId} className="eyebrow text-foreground! tracking-[0.14em] font-semibold text-2xs truncate">
           {title}
         </h2>
-        <span className="ml-auto flex items-center gap-2">
+        <span className="ml-auto flex items-center gap-2 shrink-0">
           {status}
           {actions}
         </span>
@@ -85,8 +85,8 @@ export function Widget({
         {state === "error" && (
           <StateMessage
             tone="crit"
-            title="Something went wrong"
-            description={errorMessage ?? "This panel could not be loaded."}
+            title="Telemetry fault"
+            description={errorMessage ?? "This subsystem panel could not be loaded."}
           />
         )}
         {state === "ready" && children}
@@ -99,9 +99,9 @@ export function Widget({
 export function WidgetSkeleton({ lines = 3 }: { lines?: number }) {
   return (
     <div className="space-y-3" role="status" aria-label="Loading">
-      <Skeleton className="h-6 w-1/3" />
+      <Skeleton className="h-5 w-1/3 rounded bg-surface-2" />
       {Array.from({ length: lines }, (_, i) => (
-        <Skeleton key={i} className="h-4 w-full" style={{ width: `${100 - i * 12}%` }} />
+        <Skeleton key={i} className="h-3.5 w-full rounded bg-surface-2/80" style={{ width: `${100 - i * 14}%` }} />
       ))}
     </div>
   );

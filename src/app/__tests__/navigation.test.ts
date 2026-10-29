@@ -3,8 +3,8 @@ import { getCountdown } from "../countdown";
 import { findNavItem, findNavItemByPath, NAV_ITEMS } from "../navigation";
 
 describe("navigation config", () => {
-  it("has the eleven required sections", () => {
-    expect(NAV_ITEMS).toHaveLength(11);
+  it("has the twelve required sections", () => {
+    expect(NAV_ITEMS).toHaveLength(12);
   });
   it("has unique ids and paths, all under /dashboard", () => {
     expect(new Set(NAV_ITEMS.map((i) => i.id)).size).toBe(NAV_ITEMS.length);
@@ -15,10 +15,12 @@ describe("navigation config", () => {
     expect(findNavItemByPath("/dashboard")?.id).toBe("overview");
     expect(findNavItemByPath("/dashboard/")?.id).toBe("overview");
     expect(findNavItemByPath("/dashboard/gps/")?.id).toBe("gps");
+    expect(findNavItemByPath("/dashboard/guide/")?.id).toBe("guide");
     expect(findNavItemByPath("/nope")).toBe(undefined);
   });
   it("finds an item by id", () => {
     expect(findNavItem("diagnostics").label).toBe("Diagnostics");
+    expect(findNavItem("guide").label).toBe("Connection Guide");
   });
 });
 

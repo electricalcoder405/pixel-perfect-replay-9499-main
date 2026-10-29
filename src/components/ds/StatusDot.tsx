@@ -19,7 +19,7 @@ export function StatusDot({
   return (
     <span
       className={cn(
-        "inline-block h-2 w-2 shrink-0 rounded-full bg-current shadow-[0_0_8px_currentColor]",
+        "inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-current shadow-[0_0_3px_currentColor]",
         toneText[tone],
         pulse && "animate-[pulse-led_1.6s_ease-in-out_infinite]",
         className,

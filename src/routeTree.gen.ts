@@ -16,6 +16,7 @@ import { Route as DashboardAnalyticsRouteImport } from './routes/dashboard/analy
 import { Route as DashboardDiagnosticsRouteImport } from './routes/dashboard/diagnostics'
 import { Route as DashboardGpsRouteImport } from './routes/dashboard/gps'
 import { Route as DashboardGroundStationRouteImport } from './routes/dashboard/ground-station'
+import { Route as DashboardGuideRouteImport } from './routes/dashboard/guide'
 import { Route as DashboardHistoryRouteImport } from './routes/dashboard/history'
 import { Route as DashboardLogsRouteImport } from './routes/dashboard/logs'
 import { Route as DashboardSatelliteRouteImport } from './routes/dashboard/satellite'
@@ -58,6 +59,11 @@ const DashboardGroundStationRoute = DashboardGroundStationRouteImport.update({
   path: '/ground-station',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardGuideRoute = DashboardGuideRouteImport.update({
+  id: '/guide',
+  path: '/guide',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardHistoryRoute = DashboardHistoryRouteImport.update({
   id: '/history',
   path: '/history',
@@ -96,6 +102,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/diagnostics': typeof DashboardDiagnosticsRoute
   '/dashboard/gps': typeof DashboardGpsRoute
   '/dashboard/ground-station': typeof DashboardGroundStationRoute
+  '/dashboard/guide': typeof DashboardGuideRoute
   '/dashboard/history': typeof DashboardHistoryRoute
   '/dashboard/logs': typeof DashboardLogsRoute
   '/dashboard/satellite': typeof DashboardSatelliteRoute
@@ -110,6 +117,7 @@ export interface FileRoutesByTo {
   '/dashboard/diagnostics': typeof DashboardDiagnosticsRoute
   '/dashboard/gps': typeof DashboardGpsRoute
   '/dashboard/ground-station': typeof DashboardGroundStationRoute
+  '/dashboard/guide': typeof DashboardGuideRoute
   '/dashboard/history': typeof DashboardHistoryRoute
   '/dashboard/logs': typeof DashboardLogsRoute
   '/dashboard/satellite': typeof DashboardSatelliteRoute
@@ -126,6 +134,7 @@ export interface FileRoutesById {
   '/dashboard/diagnostics': typeof DashboardDiagnosticsRoute
   '/dashboard/gps': typeof DashboardGpsRoute
   '/dashboard/ground-station': typeof DashboardGroundStationRoute
+  '/dashboard/guide': typeof DashboardGuideRoute
   '/dashboard/history': typeof DashboardHistoryRoute
   '/dashboard/logs': typeof DashboardLogsRoute
   '/dashboard/satellite': typeof DashboardSatelliteRoute
@@ -143,6 +152,7 @@ export interface FileRouteTypes {
     | '/dashboard/diagnostics'
     | '/dashboard/gps'
     | '/dashboard/ground-station'
+    | '/dashboard/guide'
     | '/dashboard/history'
     | '/dashboard/logs'
     | '/dashboard/satellite'
@@ -157,6 +167,7 @@ export interface FileRouteTypes {
     | '/dashboard/diagnostics'
     | '/dashboard/gps'
     | '/dashboard/ground-station'
+    | '/dashboard/guide'
     | '/dashboard/history'
     | '/dashboard/logs'
     | '/dashboard/satellite'
@@ -172,6 +183,7 @@ export interface FileRouteTypes {
     | '/dashboard/diagnostics'
     | '/dashboard/gps'
     | '/dashboard/ground-station'
+    | '/dashboard/guide'
     | '/dashboard/history'
     | '/dashboard/logs'
     | '/dashboard/satellite'
@@ -237,6 +249,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardGroundStationRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/guide': {
+      id: '/dashboard/guide'
+      path: '/guide'
+      fullPath: '/dashboard/guide'
+      preLoaderRoute: typeof DashboardGuideRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/history': {
       id: '/dashboard/history'
       path: '/history'
@@ -287,6 +306,7 @@ interface DashboardRouteChildren {
   DashboardDiagnosticsRoute: typeof DashboardDiagnosticsRoute
   DashboardGpsRoute: typeof DashboardGpsRoute
   DashboardGroundStationRoute: typeof DashboardGroundStationRoute
+  DashboardGuideRoute: typeof DashboardGuideRoute
   DashboardHistoryRoute: typeof DashboardHistoryRoute
   DashboardLogsRoute: typeof DashboardLogsRoute
   DashboardSatelliteRoute: typeof DashboardSatelliteRoute
@@ -301,6 +321,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardDiagnosticsRoute: DashboardDiagnosticsRoute,
   DashboardGpsRoute: DashboardGpsRoute,
   DashboardGroundStationRoute: DashboardGroundStationRoute,
+  DashboardGuideRoute: DashboardGuideRoute,
   DashboardHistoryRoute: DashboardHistoryRoute,
   DashboardLogsRoute: DashboardLogsRoute,
   DashboardSatelliteRoute: DashboardSatelliteRoute,

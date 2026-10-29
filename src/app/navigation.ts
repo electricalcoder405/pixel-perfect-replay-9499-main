@@ -14,7 +14,8 @@ export type NavIconName =
   | "diagnostics"
   | "analytics"
   | "history"
-  | "settings";
+  | "settings"
+  | "guide";
 
 export type NavPath =
   | "/dashboard"
@@ -27,7 +28,8 @@ export type NavPath =
   | "/dashboard/diagnostics"
   | "/dashboard/analytics"
   | "/dashboard/history"
-  | "/dashboard/settings";
+  | "/dashboard/settings"
+  | "/dashboard/guide";
 
 export interface NavItem {
   readonly id: NavIconName;
@@ -120,6 +122,12 @@ export const NAV_GROUPS: readonly NavGroup[] = [
   {
     label: "System",
     items: [
+      {
+        id: "guide",
+        label: "Connection Guide",
+        to: "/dashboard/guide",
+        description: "Step-by-step hardware wiring, firmware flashing, and live telemetry connection verification.",
+      },
       {
         id: "settings",
         label: "Settings",

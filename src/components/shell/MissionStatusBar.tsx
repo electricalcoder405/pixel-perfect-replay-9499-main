@@ -36,7 +36,7 @@ export const MissionStatusBar = memo(function MissionStatusBar() {
   const statuses = useMemo(() => parseSensorStatusKey(statusKey), [statusKey]);
 
   return (
-    <div className="flex flex-wrap items-center gap-x-6 gap-y-2 border-b border-border bg-surface-0/70 px-4 py-2 md:px-6">
+    <div className="flex flex-wrap items-center gap-x-6 gap-y-2 border-b border-border/70 bg-surface-0/70 px-4 py-2 md:px-6 backdrop-blur-xs">
       <ul className="flex flex-wrap items-center gap-2" aria-label="Sensor status">
         {SENSORS.map((sensor, i) => {
           const status = statuses[i] ?? "awaiting";
@@ -76,9 +76,9 @@ function Stat({
   return (
     <div className="flex items-baseline gap-2">
       <dt>
-        <Eyebrow>{label}</Eyebrow>
+        <Eyebrow className="text-[10px] tracking-[0.14em] font-semibold">{label}</Eyebrow>
       </dt>
-      <dd className={`num text-sm ${missing ? "text-muted-foreground" : "text-foreground"}`}>
+      <dd className={`num text-xs font-mono font-bold tracking-tight ${missing ? "text-muted-foreground" : "text-foreground"}`}>
         {value}
         {missing && <span className="sr-only">No data</span>}
       </dd>

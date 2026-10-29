@@ -12,10 +12,10 @@ export interface Attitude {
 }
 
 // three.js cannot parse oklch(), so the scene uses hex equivalents of the theme colours.
-const CYAN = "#5fd6e8";
-const AMBER = "#e9a23b";
-const COPPER = "#b86a2e";
-const PURPLE = "#a98bf0";
+const CYAN = "#31C8FF";
+const AMBER = "#1D7CF2";
+const COPPER = "#31C8FF";
+const PURPLE = "#818cf8";
 
 const EARTH_RADIUS = 2;
 const ORBIT_RADIUS = 3.4;
@@ -288,7 +288,7 @@ export function SatelliteScene({
       <color attach="background" args={["#05070d"]} />
       <Stars radius={90} depth={50} count={3500} factor={4} saturation={0} fade speed={0.6} />
       <ambientLight intensity={0.45} />
-      <directionalLight position={[6, 4, 5]} intensity={2.4} color="#ffe2b8" />
+      <directionalLight position={[6, 4, 5]} intensity={2.4} color="#d4e8ff" />
       <pointLight position={[-4, -2, 3]} intensity={14} color={CYAN} />
       <pointLight position={[0, 4, -5]} intensity={8} color={PURPLE} />
 

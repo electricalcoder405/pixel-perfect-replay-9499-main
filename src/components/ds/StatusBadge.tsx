@@ -20,7 +20,7 @@ export function StatusBadge({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 font-data text-2xs font-medium uppercase tracking-[0.12em]",
+        "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 font-data text-2xs font-semibold uppercase tracking-[0.13em] backdrop-blur-xs select-none",
         toneSurface[tone],
         className,
       )}

@@ -5,14 +5,17 @@
 @custom-variant dark (&:is(.dark *));
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   Old Monk Mission Control — design tokens
+   ORBITRA'26 Mission Control — Earth Blue + Space Black Palette
 
-   Palette: deep black and charcoal surfaces, copper and amber for brand and
-   emphasis, cyan for live telemetry, purple for orbital accents. Status colours
-   (success / warning / critical) stay saturated so state is readable at a glance.
-
-   All colours are defined once as CSS variables below; components must use the
-   Tailwind names (text-amber, bg-card, ...) and never hard-coded colour values.
+   Palette:
+   - Primary Background: #07090e / existing dark space black surfaces
+   - Primary Accent: #1D7CF2 (Earth Blue)
+   - Secondary Accent: #31C8FF (Electric/Sky Blue)
+   - Hover Accent: #58B8FF (Bright Earth Blue)
+   - Text: Existing white / light gray
+   - Success: #22C55E
+   - Warning: #FACC15
+   - Error: #EF4444
    ───────────────────────────────────────────────────────────────────────────── */
 
 @theme inline {
@@ -41,11 +44,12 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
 
-  /* Brand and telemetry colours */
+  /* Brand and telemetry colours - Earth Blue & Sky Blue */
   --color-copper: var(--copper);
   --color-amber: var(--amber);
   --color-cyan: var(--cyan);
   --color-purple: var(--purple);
+  --color-hover-accent: var(--hover-accent);
   --color-success: var(--success);
   --color-warning: var(--warning);
   --color-critical: var(--critical);
@@ -56,14 +60,13 @@
   --color-surface-2: var(--surface-2);
   --color-surface-3: var(--surface-3);
 
-  /* Typography. Space Grotesk for headings and brand, Inter for interface text,
-     IBM Plex Sans for data labels, IBM Plex Mono for values and logs. */
+  /* Typography */
   --font-display: "Space Grotesk", "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-data: "IBM Plex Sans", "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
 
-  /* Type scale. Nothing smaller than 0.6875rem (11px) is used by new components. */
+  /* Type scale */
   --text-2xs: 0.6875rem;
   --text-2xs--line-height: 1rem;
   --text-metric-sm: 1.25rem;
@@ -75,10 +78,12 @@
   --text-display: 3rem;
   --text-display--line-height: 1;
 
-  /* Shadows and subtle glows - refined for clean aerospace look */
-  --shadow-glow-cyan: 0 2px 14px -6px color-mix(in oklab, var(--cyan) 35%, transparent);
-  --shadow-glow-amber: 0 2px 14px -6px color-mix(in oklab, var(--amber) 35%, transparent);
-  --shadow-panel: inset 0 1px 0 oklch(1 0 0 / 4%), 0 2px 8px oklch(0 0 0 / 45%);
+  /* Shadows and subtle elevation in Earth Blue */
+  --shadow-glow-cyan: 0 2px 10px -4px color-mix(in oklab, #31C8FF 25%, transparent);
+  --shadow-glow-amber: 0 2px 10px -4px color-mix(in oklab, #1D7CF2 25%, transparent);
+  --shadow-panel: inset 0 1px 0 oklch(1 0 0 / 5%), 0 2px 10px oklch(0 0 0 / 55%);
+  --shadow-elevation-1: inset 0 1px 0 oklch(1 0 0 / 5%), 0 2px 8px -1px oklch(0 0 0 / 50%);
+  --shadow-elevation-2: inset 0 1px 0 oklch(1 0 0 / 7%), 0 4px 18px -3px oklch(0 0 0 / 65%);
 
   /* Motion */
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
@@ -88,44 +93,47 @@
 :root {
   --radius: 0.75rem;
 
-  /* Surfaces: warm near-black to charcoal */
+  /* Surfaces: space black to deep charcoal (preserved as requested) */
   --background: oklch(0.12 0.004 60);
   --surface-0: oklch(0.12 0.004 60);
   --surface-1: oklch(0.16 0.006 60);
   --surface-2: oklch(0.2 0.008 60);
   --surface-3: oklch(0.25 0.01 60);
 
+  /* Text: white and crisp light gray */
   --foreground: oklch(0.96 0.006 80);
   --card: oklch(0.16 0.006 60 / 96%);
   --card-foreground: oklch(0.96 0.006 80);
   --popover: oklch(0.17 0.007 60);
   --popover-foreground: oklch(0.96 0.006 80);
 
-  --primary: oklch(0.76 0.15 72);
-  --primary-foreground: oklch(0.14 0.01 60);
+  /* Primary Accent: #1D7CF2 */
+  --primary: #1D7CF2;
+  --primary-foreground: #ffffff;
   --secondary: oklch(0.22 0.008 60);
   --secondary-foreground: oklch(0.96 0.006 80);
   --muted: oklch(0.23 0.008 60);
   --muted-foreground: oklch(0.72 0.015 75);
-  --accent: oklch(0.82 0.12 200);
-  --accent-foreground: oklch(0.14 0.01 60);
-  --destructive: oklch(0.65 0.22 25);
-  --destructive-foreground: oklch(0.98 0 0);
+  --accent: #1D7CF2;
+  --accent-foreground: #ffffff;
+  --destructive: #EF4444;
+  --destructive-foreground: #ffffff;
 
   --border: oklch(0.82 0.08 70 / 15%);
   --input: oklch(0.82 0.08 70 / 20%);
-  --ring: oklch(0.82 0.12 200);
+  --ring: #1D7CF2;
 
-  /* Brand and telemetry */
-  --copper: oklch(0.64 0.12 48);
-  --amber: oklch(0.76 0.15 72);
-  --cyan: oklch(0.82 0.12 200);
-  --purple: oklch(0.7 0.15 295);
+  /* Earth Blue + Space Black Color Replacements */
+  --amber: #1D7CF2;        /* Primary Accent: #1D7CF2 (replaces orange) */
+  --copper: #31C8FF;       /* Secondary Accent: #31C8FF (replaces copper) */
+  --cyan: #31C8FF;         /* Secondary Accent: #31C8FF */
+  --hover-accent: #58B8FF; /* Hover Accent: #58B8FF */
+  --purple: #818cf8;
 
-  /* Status */
-  --success: oklch(0.8 0.18 155);
-  --warning: oklch(0.78 0.16 70);
-  --critical: oklch(0.67 0.22 25);
+  /* Status Colors */
+  --success: #22C55E;      /* Success: #22C55E */
+  --warning: #FACC15;      /* Warning: #FACC15 */
+  --critical: #EF4444;     /* Error: #EF4444 */
 }
 
 @layer base {
@@ -143,6 +151,7 @@
     font-family: var(--font-sans);
     font-feature-settings: "cv11", "ss01";
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
   }
   h1,
@@ -150,6 +159,7 @@
   h3,
   h4 {
     font-family: var(--font-display);
+    letter-spacing: -0.015em;
   }
 
   /* Keyboard focus is always visible and never relies on colour alone. */
@@ -159,19 +169,19 @@
     border-radius: var(--radius-sm);
   }
   ::selection {
-    background: color-mix(in oklab, var(--amber) 35%, transparent);
+    background: color-mix(in oklab, #1D7CF2 35%, transparent);
   }
 }
 
 /* Surfaces */
 @utility glass {
-  background: linear-gradient(160deg, oklch(0.16 0.006 60 / 95%), oklch(0.12 0.004 60 / 97%));
-  backdrop-filter: blur(8px);
-  border: 1px solid oklch(0.82 0.08 70 / 12%);
+  background: linear-gradient(160deg, oklch(0.16 0.006 60 / 94%), oklch(0.12 0.004 60 / 96%));
+  backdrop-filter: blur(12px);
+  border: 1px solid oklch(0.82 0.08 70 / 14%);
   border-radius: var(--radius-xl);
   box-shadow:
-    inset 0 1px 0 oklch(1 0 0 / 4%),
-    0 4px 16px -6px oklch(0 0 0 / 50%);
+    inset 0 1px 0 oklch(1 0 0 / 5%),
+    0 4px 20px -4px oklch(0 0 0 / 60%);
 }
 @utility surface-solid {
   background: var(--surface-1);
@@ -180,9 +190,10 @@
   box-shadow: var(--shadow-panel);
 }
 @utility surface-inset {
-  background: var(--surface-0);
-  border: 1px solid var(--border);
+  background: oklch(0.10 0.004 60);
+  border: 1px solid oklch(0.82 0.08 70 / 13%);
   border-radius: var(--radius-md);
+  box-shadow: inset 0 1px 3px oklch(0 0 0 / 40%);
 }
 
 /* Page width and gutters shared by the landing page and the dashboard shell */
@@ -196,22 +207,22 @@
   }
 }
 
-/* Text */
+/* Typography Utilities */
 @utility glow-amber {
-  text-shadow: 0 0 8px color-mix(in oklab, var(--amber) 30%, transparent);
+  text-shadow: 0 1px 2px oklch(0 0 0 / 70%);
 }
 @utility glow-copper {
-  text-shadow: 0 0 8px color-mix(in oklab, var(--copper) 30%, transparent);
+  text-shadow: 0 1px 2px oklch(0 0 0 / 70%);
 }
 @utility glow-cyan {
-  text-shadow: 0 0 8px color-mix(in oklab, var(--cyan) 30%, transparent);
+  text-shadow: 0 1px 2px oklch(0 0 0 / 70%);
 }
 @utility eyebrow {
   font-family: var(--font-data);
   font-size: var(--text-2xs);
   line-height: var(--text-2xs--line-height);
-  font-weight: 500;
-  letter-spacing: 0.16em;
+  font-weight: 600;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--muted-foreground);
 }
@@ -220,6 +231,12 @@
   font-variant-numeric: tabular-nums;
   font-feature-settings: "zero";
 }
+@utility mission-header {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
 
 /* Indicators and decoration */
 @utility led {
@@ -227,7 +244,7 @@
   height: 0.4375rem;
   border-radius: 9999px;
   background: currentColor;
-  box-shadow: 0 0 4px color-mix(in oklab, currentColor 50%, transparent);
+  box-shadow: 0 0 3px color-mix(in oklab, currentColor 40%, transparent);
   animation: pulse-led 1.8s ease-in-out infinite;
 }
 @utility ping-ring {

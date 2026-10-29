@@ -4,9 +4,9 @@ import { NO_DATA } from "@/telemetry/format";
 type MetricSize = "sm" | "md" | "lg";
 
 const sizeClass: Record<MetricSize, string> = {
-  sm: "text-metric-sm",
-  md: "text-metric-md",
-  lg: "text-metric-lg",
+  sm: "text-metric-sm font-bold tracking-tight",
+  md: "text-metric-md font-bold tracking-tight",
+  lg: "text-metric-lg font-bold tracking-tight",
 };
 
 export interface MetricValueProps {
@@ -45,16 +45,18 @@ export function MetricValue({
   return (
     <span
       className={cn(
-        "num inline-flex items-baseline gap-1 font-semibold text-foreground",
+        "num inline-flex items-baseline gap-1 font-mono text-foreground tabular-nums select-all",
         sizeClass[size],
-        missing && "text-muted-foreground",
+        missing && "text-muted-foreground font-normal",
         className,
       )}
     >
       <span aria-hidden={missing || undefined}>{text}</span>
       {missing && <span className="sr-only">No data</span>}
       {unit && !missing && (
-        <span className="text-2xs font-normal text-muted-foreground">{unit}</span>
+        <span className="text-2xs font-sans font-medium uppercase tracking-wider text-muted-foreground/80">
+          {unit}
+        </span>
       )}
     </span>
   );

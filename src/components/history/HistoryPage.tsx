@@ -208,7 +208,7 @@ export function HistoryPage() {
                     onClick={() => setSpeed(s)}
                     className={`rounded px-2 py-0.5 font-mono text-2xs transition-colors ${
                       speed === s
-                        ? "bg-amber text-black font-semibold"
+                        ? "bg-amber text-white font-semibold"
                         : "bg-surface-1 text-muted-foreground border border-border hover:text-foreground"
                     }`}
                   >

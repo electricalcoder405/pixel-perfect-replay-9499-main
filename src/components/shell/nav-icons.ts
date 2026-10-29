@@ -1,5 +1,7 @@
 import {
   Activity,
+  BookOpen,
+  Cpu,
   History,
   LayoutDashboard,
   LineChart,
@@ -9,7 +11,6 @@ import {
   ScrollText,
   Settings,
   Stethoscope,
-  Cpu,
 } from "lucide-react";
 import type { ComponentType, SVGProps } from "react";
 import type { NavIconName } from "@/app/navigation";
@@ -28,5 +29,6 @@ export const NAV_ICONS: Record<NavIconName, IconComponent> = {
   diagnostics: Stethoscope,
   analytics: LineChart,
   history: History,
+  guide: BookOpen,
   settings: Settings,
 };

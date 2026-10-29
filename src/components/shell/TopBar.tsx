@@ -10,7 +10,7 @@ import { WorldClocks } from "./WorldClocks";
 
 /**
  * Sticky top bar: location, Mission Source selector (Demo vs Ground Controller),
- * clocks, mission timer, and link state.
+ * clocks, mission timer, and link state with refined aerospace typography.
  */
 export function TopBar({ onOpenNav }: { onOpenNav: () => void }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -18,7 +18,7 @@ export function TopBar({ onOpenNav }: { onOpenNav: () => void }) {
   const { isDemo, isGroundController, setMode } = useTelemetryMode();
 
   return (
-    <header className="border-b border-border bg-surface-0/80 backdrop-blur-md">
+    <header className="border-b border-border/70 bg-surface-0/85 backdrop-blur-md sticky top-0 z-30">
       <div className="flex h-14 items-center gap-3 px-4 md:px-6">
         <Button
           variant="ghost"
@@ -30,14 +30,14 @@ export function TopBar({ onOpenNav }: { onOpenNav: () => void }) {
           <Menu />
         </Button>
 
-        <p className="min-w-0 flex-1 truncate font-display text-sm text-muted-foreground">
-          <span className="max-sm:sr-only">Mission Control / </span>
-          <span className="font-medium text-foreground">{section?.label ?? "Dashboard"}</span>
+        <p className="min-w-0 flex-1 truncate font-display text-xs md:text-sm text-muted-foreground tracking-tight">
+          <span className="max-sm:sr-only font-normal opacity-70">Mission Control / </span>
+          <span className="font-semibold text-foreground">{section?.label ?? "Dashboard"}</span>
         </p>
 
         {/* Mission Source Selector: Demo vs Ground Controller */}
         <div
-          className="flex items-center gap-1 rounded-md border border-border bg-surface-1/90 p-0.5 font-mono text-2xs shadow-xs"
+          className="flex items-center gap-1 rounded-md border border-border/80 bg-surface-1/90 p-0.5 font-mono text-2xs shadow-xs"
           role="radiogroup"
           aria-label="Mission Telemetry Source"
         >
@@ -50,17 +50,17 @@ export function TopBar({ onOpenNav }: { onOpenNav: () => void }) {
             aria-checked={isDemo}
             onClick={() => setMode("demo")}
             className={cn(
-              "flex items-center gap-1.5 rounded px-2.5 py-1 text-2xs transition-all",
+              "flex items-center gap-1.5 rounded px-2.5 py-1 text-2xs transition-all cursor-pointer",
               isDemo
-                ? "bg-amber text-black font-semibold shadow-xs"
-                : "text-muted-foreground hover:bg-surface-2 hover:text-foreground",
+                ? "bg-amber text-white font-bold shadow-xs"
+                : "text-muted-foreground hover:bg-surface-2 hover:text-foreground font-medium",
             )}
             title="Demo Mode: Uses internal telemetry simulator. No hardware required."
           >
             <span
               className={cn(
                 "h-1.5 w-1.5 rounded-full",
-                isDemo ? "bg-black" : "bg-muted-foreground/60",
+                isDemo ? "bg-white" : "bg-muted-foreground/60",
               )}
             />
             Demo
@@ -71,17 +71,17 @@ export function TopBar({ onOpenNav }: { onOpenNav: () => void }) {
             aria-checked={isGroundController}
             onClick={() => setMode("ground-controller")}
             className={cn(
-              "flex items-center gap-1.5 rounded px-2.5 py-1 text-2xs transition-all",
+              "flex items-center gap-1.5 rounded px-2.5 py-1 text-2xs transition-all cursor-pointer",
               isGroundController
-                ? "bg-cyan text-black font-semibold shadow-xs"
-                : "text-muted-foreground hover:bg-surface-2 hover:text-foreground",
+                ? "bg-cyan text-white font-bold shadow-xs"
+                : "text-muted-foreground hover:bg-surface-2 hover:text-foreground font-medium",
             )}
             title="Ground Controller Mode: Live telemetry from ESP8266 receiver via bridge.js"
           >
             <span
               className={cn(
                 "h-1.5 w-1.5 rounded-full",
-                isGroundController ? "bg-black animate-pulse" : "bg-muted-foreground/60",
+                isGroundController ? "bg-white animate-pulse" : "bg-muted-foreground/60",
               )}
             />
             Ground Controller

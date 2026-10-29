@@ -65,7 +65,7 @@ export function ArtificialHorizon({
               y="100"
               width="440"
               height="400"
-              fill="color-mix(in oklab, var(--copper) 45%, #140a04)"
+              fill="color-mix(in oklab, var(--copper) 45%, #080d1a)"
             />
             <line x1="-120" y1="100" x2="320" y2="100" stroke="var(--amber)" strokeWidth="1.5" />
             {ladder.map((deg) => {
